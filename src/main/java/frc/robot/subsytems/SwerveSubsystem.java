@@ -2,6 +2,7 @@
 
 package frc.robot.subsytems;
 
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import swervelib.SwerveDrive;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Pose2d;
 
 public class SwerveSubsystem extends SubsystemBase {
@@ -58,7 +60,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void driveRelative(double velocity_x, double velocity_y, double rotation) { // driving relative to the robot
     ChassisSpeeds velocity = new ChassisSpeeds(velocity_x, velocity_y, Units.degreesToRadians(rotation)); // see luke vu's wonderful lecture
+    Logger.recordOutput("Sigma", "67");
     m_swerveDrive.drive(velocity);
+  }
+  
+  public Command driveRelativeCommand(Translation2d translation) {
+    Logger.recordOutput("getName()", "null");
+    return run(() -> {
+      driveRelative(translation.getX(), translation.getY(), 0); // runs this function
+    });
   }
   
   public void driveFieldOriented(double velocity_x, double velocity_y, double rotation) {

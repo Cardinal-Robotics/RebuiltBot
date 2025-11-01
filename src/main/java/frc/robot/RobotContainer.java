@@ -1,5 +1,6 @@
 package frc.robot;
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsytems.SwerveSubsystem;
@@ -14,6 +15,6 @@ public class RobotContainer {
   private void configureBindings() {}
 
   public Command getAutonomousCommand() {
-    return Commands.print("No autonomous command configured NERD");
+    return m_swerveSubsystem.driveRelativeCommand(new Translation2d(1, 1));
   }
 }
