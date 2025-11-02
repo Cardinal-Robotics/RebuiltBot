@@ -95,6 +95,10 @@ public class SwerveSubsystem extends SubsystemBase {
     return m_swerveDrive;
   }
 
+  public Pose2d getPose2d() {
+    return m_swerveDrive.getPose();
+  }
+
   public void setupPathPlanner() {
         // Load the RobotConfig from the GUI settings. You should probably
         // store this in your Constants file
@@ -103,7 +107,7 @@ public class SwerveSubsystem extends SubsystemBase {
             config = RobotConfig.fromGUISettings();
 
             System.out.println("Autobuilder Configured");
-            
+
             AutoBuilder.configure(
                     m_swerveDrive::getPose,
                     m_swerveDrive::resetOdometry,

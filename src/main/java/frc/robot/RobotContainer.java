@@ -6,7 +6,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.subsytems.SimulationSubsystem;
 import frc.robot.subsytems.SwerveSubsystem;
+import frc.robot.subsytems.VisionSubsystem;
 import swervelib.SwerveInputStream;
 
 import frc.robot.Constants.OperatorConstants;
@@ -15,6 +17,8 @@ import frc.robot.Constants.DriveConstants;;
 public class RobotContainer {
 
   private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(); // awesome
+  private final SimulationSubsystem m_smulationSubsystem = new SimulationSubsystem();
+  private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveSubsystem);
 
   private final CommandXboxController m_driverController = 
     new CommandXboxController(OperatorConstants.kDriverControllerPort);
