@@ -5,6 +5,7 @@
 package frc.robot.subsytems;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.ejml.dense.block.MatrixOps_DDRB;
 import org.littletonrobotics.junction.Logger;
@@ -14,12 +15,15 @@ import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.simulation.VisionTargetSim;
+import org.photonvision.targeting.PhotonTrackedTarget;
+import org.photonvision.targeting.TargetCorner;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,6 +32,8 @@ public class VisionSubsystem extends SubsystemBase {
   AprilTagFieldLayout tagLayout;
   VisionSystemSim visionSim;
   SwerveSubsystem m_swerveSubsystem;
+  PhotonCamera camera;
+  PhotonCameraSim cameraSim;
   
   /** Creates a new VisionSubsystem. */
   public VisionSubsystem(SwerveSubsystem swerveSubsystem) {
@@ -43,25 +49,28 @@ public class VisionSubsystem extends SubsystemBase {
     visionSim.addVisionTargets(visionTarget);
     
     try {
+
       this.tagLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
+      visionSim.addAprilTags(tagLayout); 
+
     } catch (IOException e) {
       Logger.recordOutput("VISION SIM ERROR", "TRUE");
     }
 
-    visionSim.addAprilTags(tagLayout);
 
     // SETTING UP CAMERA IN SIMULATION
+    camera = new PhotonCamera("mainCamera"); // placeholder camera for the simulation
     SimCameraProperties cameraProp = new SimCameraProperties();
-
-    PhotonCamera camera = new PhotonCamera("mainCamera");
-
-    PhotonCameraSim cameraSim = new PhotonCameraSim(camera, cameraProp);
-
+    cameraSim = new PhotonCameraSim(camera, cameraProp); // the simulation using the camera and the properties
+    
     Translation3d robotToCameraTrans = new Translation3d(.1, 0, .5); // camera location from robot pose
-
-    Rotation3d robotToCameraRotation = new Rotation3d(0, Math.toRadians(-15), 0);
-
+    Rotation3d robotToCameraRotation = new Rotation3d(0, 0/* Math.toRadians(-15) */, 0);
     Transform3d robotToCamera = new Transform3d(robotToCameraTrans, robotToCameraRotation);
+
+    visionSim.addCamera(cameraSim, robotToCamera);
+
+    
+    
     
     cameraSim.enableRawStream(true);
     cameraSim.enableProcessedStream(true);
@@ -71,7 +80,29 @@ public class VisionSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
+
+    var results = camera.getLatestResult(); // all the info about the detected targets
+  
+    boolean hasTargets = results.hasTargets(); // is there any valid targets??
+  
+    if (results.hasTargets()) {
+      List<PhotonTrackedTarget> targets = results.getTargets(); // gets all of the targets
+      PhotonTrackedTarget target = results.getBestTarget(); // best target
+      // GETTING DATA FROM THE TARGETS
+      double yaw = target.getYaw();
+      double pitch = target.getPitch();
+      double area = target.getArea();
+      double skew = target.getSkew();
+      Transform3d bestCameratoTarget = target.getBestCameraToTarget();
+      Transform3d alternateCameraToTarget = target.getAlternateCameraToTarget();
+      List<TargetCorner> corners = target.getMinAreaRectCorners();
+    
+      int targetID = target.getFiducialId();
+      double poseAmbiguity = target.getPoseAmbiguity();
+    }
+    
     visionSim.update(m_swerveSubsystem.getPose2d());
+
     
     visionSim.getDebugField();
   }
