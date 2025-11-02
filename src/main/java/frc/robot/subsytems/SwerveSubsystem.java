@@ -31,22 +31,32 @@ import edu.wpi.first.math.geometry.Pose2d;
 import frc.robot.Constants.DriveConstants;
 
 public class SwerveSubsystem extends SubsystemBase {
-    private SwerveDrive m_swerveDrive; // create variable so the whole class can see it
-  
+  public int driveType;
+  private SwerveDrive m_swerveDrive; // create variable so the whole class can see it
+
   public SwerveSubsystem() {
+    driveType = 0;
+
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH; // quoth Lil Vu: "tells YAGSL to print a bunch of stuff"
 
-    File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(),"swerve"); // goes to filesystem, finds deploy folder, gets swerve folder, gets the JSON
-  
-    
-    try { 
-      m_swerveDrive = new SwerveParser(swerveJsonDirectory).createSwerveDrive(DriveConstants.kMaxSpeed); // makes the thing to read the JSON, makes a new Swerve drive with the maxspeed
+    File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve"); // goes to filesystem, finds deploy
+                                                                                    // folder, gets swerve folder, gets
+                                                                                    // the JSON
+
+    try {
+      m_swerveDrive = new SwerveParser(swerveJsonDirectory).createSwerveDrive(DriveConstants.kMaxSpeed); // makes the
+                                                                                                         // thing to
+                                                                                                         // read the
+                                                                                                         // JSON, makes
+                                                                                                         // a new Swerve
+                                                                                                         // drive with
+                                                                                                         // the maxspeed
     } catch (IOException e) { // if we get this error then:
       throw new RuntimeException(e);
     }
-    
+
     Pose2d kInitialBlueRobotPose = new Pose2d(7.469, 7.457, Rotation2d.k180deg);
-    
+
     m_swerveDrive.field.setRobotPose(kInitialBlueRobotPose);
     m_swerveDrive.resetOdometry(kInitialBlueRobotPose);
 
@@ -61,24 +71,21 @@ public class SwerveSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     Pose2d position = m_swerveDrive.getPose();
     Logger.recordOutput("YAGSL", position);
-  
-    
+
   }
 
+  public void driveRelative(ChassisSpeeds velocity) { // driving relative to the robot
 
-  public void driveRelative(double velocity_x, double velocity_y, double rotation) { // driving relative to the robot
-    ChassisSpeeds velocity = new ChassisSpeeds(velocity_x, velocity_y, Units.degreesToRadians(rotation)); // see luke vu's wonderful lecture
-    Logger.recordOutput("Sigma", "67");
     m_swerveDrive.drive(velocity);
+
   }
-  
-  public Command driveRelativeCommand(Translation2d translation) {
-    Logger.recordOutput("getName()", "null");
+
+  public Command driveRelative(Supplier<ChassisSpeeds> velocity) {
     return run(() -> {
-      driveRelative(translation.getX(), translation.getY(), 0); // runs this function
+      driveRelative(velocity.get()); // runs this function
     });
   }
-  
+
   public void driveFieldOriented(ChassisSpeeds velocity) {
 
     m_swerveDrive.driveFieldOriented(velocity);
@@ -91,6 +98,11 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
+  public void toggleDriveType() {
+    driveType = (driveType == 0) ? 1 : 0;
+    System.out.println("Drive type toggled to " + (driveType == 0 ? "FIELD" : "RELATIVE"));
+  }
+
   public SwerveDrive getSwerveDrive() {
     return m_swerveDrive;
   }
@@ -100,35 +112,35 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   public void setupPathPlanner() {
-        // Load the RobotConfig from the GUI settings. You should probably
-        // store this in your Constants file
-        RobotConfig config;
-        try {
-            config = RobotConfig.fromGUISettings();
+    // Load the RobotConfig from the GUI settings. You should probably
+    // store this in your Constants file
+    RobotConfig config;
+    try {
+      config = RobotConfig.fromGUISettings();
 
-            System.out.println("Autobuilder Configured");
+      System.out.println("Autobuilder Configured");
 
-            AutoBuilder.configure(
-                    m_swerveDrive::getPose,
-                    m_swerveDrive::resetOdometry,
-                    m_swerveDrive::getRobotVelocity,
-                    (speedsRobotRelative, moduleFeedForwards) -> {
-                        m_swerveDrive.drive(
-                                speedsRobotRelative,
-                                m_swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
-                                moduleFeedForwards.linearForces());
-                    },
-                    DriveConstants.kPathDriveController, // Rotation PID
-                    config,
-                    () -> {
-                        Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-                        return alliance == DriverStation.Alliance.Red;
-                    },
-                    this);
+      AutoBuilder.configure(
+          m_swerveDrive::getPose,
+          m_swerveDrive::resetOdometry,
+          m_swerveDrive::getRobotVelocity,
+          (speedsRobotRelative, moduleFeedForwards) -> {
+            m_swerveDrive.drive(
+                speedsRobotRelative,
+                m_swerveDrive.kinematics.toSwerveModuleStates(speedsRobotRelative),
+                moduleFeedForwards.linearForces());
+          },
+          DriveConstants.kPathDriveController, // Rotation PID
+          config,
+          () -> {
+            Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
+            return alliance == DriverStation.Alliance.Red;
+          },
+          this);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+  }
 
 }

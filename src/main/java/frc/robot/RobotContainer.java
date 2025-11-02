@@ -16,9 +16,17 @@ import frc.robot.Constants.DriveConstants;;
 
 public class RobotContainer {
 
+  // SUBSYSTEMS
+  // -----------------------------------------------------------------------------------
   private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(); // awesome
   private final SimulationSubsystem m_smulationSubsystem = new SimulationSubsystem();
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveSubsystem);
+  // -----------------------------------------------------------------------------------
+
+  // COMMANDS
+  // -----------------------------------------------------------------------------------
+
+  // -----------------------------------------------------------------------------------
 
   private final CommandXboxController m_driverController = 
     new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -40,11 +48,35 @@ public class RobotContainer {
                                                                                              m_driverController::getRightY)
                                                                                              .headingWhile(true);
 
+  SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
+                                                                    .allianceRelativeControl(false)
+                                                                    .withControllerRotationAxis(() -> m_driverController.getRightX() * -1);
+                                
+                                  
+
   Command driveFieldOritentedDirectAngle = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
-
+  
   Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
+  
+  Command driveRobotOrientedAngularVelocity  = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    m_driverController.a().toggleOnTrue(driveRobotOrientedAngularVelocity);
+
+/*     m_driverController.x().onTrue(Commands.runOnce(() -> {
+      m_swerveSubsystem.toggleDriveType();
+  
+      System.out.println(m_swerveSubsystem.getDefaultCommand());
+
+      if (m_swerveSubsystem.driveType == 0) {
+        m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
+        System.out.println("Drive mode: FIELD ORIENTED");
+      } else {
+        m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
+        System.out.println("Drive mode: ROBOT RELATIVE");
+      }
+    })); */
+  }
 
   public Command getAutonomousCommand() {
     return new PathPlannerAuto("Lucas' Auto");
