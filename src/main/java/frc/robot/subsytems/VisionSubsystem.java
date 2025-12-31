@@ -99,6 +99,7 @@ public class VisionSubsystem extends SubsystemBase {
     
       int targetID = target.getFiducialId();
       double poseAmbiguity = target.getPoseAmbiguity();
+
     }
     
     visionSim.update(m_swerveSubsystem.getPose2d());

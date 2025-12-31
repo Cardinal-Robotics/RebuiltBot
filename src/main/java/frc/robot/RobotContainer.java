@@ -12,6 +12,7 @@ import frc.robot.subsytems.VisionSubsystem;
 import swervelib.SwerveInputStream;
 
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.commands.AprilTagAlign;
 import frc.robot.Constants.DriveConstants;;
 
 public class RobotContainer {
@@ -59,9 +60,13 @@ public class RobotContainer {
   Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
   
   Command driveRobotOrientedAngularVelocity  = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
+  Command driveAutoAlign = m_swerveSubsystem.driveToAprilTag();
 
   private void configureBindings() {
     m_driverController.a().toggleOnTrue(driveRobotOrientedAngularVelocity);
+    m_driverController.b().toggleOnTrue(driveAutoAlign);
+
+
 
 /*     m_driverController.x().onTrue(Commands.runOnce(() -> {
       m_swerveSubsystem.toggleDriveType();
