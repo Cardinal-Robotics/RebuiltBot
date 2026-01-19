@@ -29,11 +29,13 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class VisionSubsystem extends SubsystemBase {
+  
   AprilTagFieldLayout tagLayout;
   VisionSystemSim visionSim;
   SwerveSubsystem m_swerveSubsystem;
   PhotonCamera camera;
   PhotonCameraSim cameraSim;
+  public int targetID;
   
   /** Creates a new VisionSubsystem. */
   public VisionSubsystem(SwerveSubsystem swerveSubsystem) {
@@ -50,7 +52,7 @@ public class VisionSubsystem extends SubsystemBase {
     
     try {
 
-      this.tagLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.kDefaultField.m_resourceFile);
+      this.tagLayout = AprilTagFieldLayout.loadFromResource(AprilTagFields.k2026RebuiltWelded.m_resourceFile);
       visionSim.addAprilTags(tagLayout); 
 
     } catch (IOException e) {
@@ -77,10 +79,21 @@ public class VisionSubsystem extends SubsystemBase {
     cameraSim.enableDrawWireframe(true);
     
   }
+
+  public int getBestTargetId() {
+    var results = camera.getLatestResult(); // all the info about the detected targets
+  
+    boolean hasTargets = results.hasTargets(); // is there any valid targets??
+  
+    if (results.hasTargets()) {
+      PhotonTrackedTarget target = results.getBestTarget(); // best target
+    
+      return target.getFiducialId();
+    } else return -1;
+  }
   
   @Override
   public void periodic() {
-
     var results = camera.getLatestResult(); // all the info about the detected targets
   
     boolean hasTargets = results.hasTargets(); // is there any valid targets??
@@ -97,10 +110,10 @@ public class VisionSubsystem extends SubsystemBase {
       Transform3d alternateCameraToTarget = target.getAlternateCameraToTarget();
       List<TargetCorner> corners = target.getMinAreaRectCorners();
     
-      int targetID = target.getFiducialId();
+      targetID = target.getFiducialId();
       double poseAmbiguity = target.getPoseAmbiguity();
 
-    }
+    } else targetID = -1;
     
     visionSim.update(m_swerveSubsystem.getPose2d());
 

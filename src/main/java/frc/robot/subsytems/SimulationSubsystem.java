@@ -6,8 +6,8 @@ package frc.robot.subsytems;
 
 import java.util.List;
 
-import org.ironmaple.simulation.SimulatedArena;
-import org.ironmaple.simulation.gamepieces.GamePiece;
+import swervelib.simulation.ironmaple.simulation.SimulatedArena;
+import swervelib.simulation.ironmaple.simulation.gamepieces.GamePiece;
 
 import org.littletonrobotics.junction.Logger;
 

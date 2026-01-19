@@ -6,12 +6,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.io.File;
 import java.io.IOException;
+import java.io.ObjectInputFilter.Config;
 import java.util.function.Supplier;
 
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.controllers.PathFollowingController;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -25,6 +29,7 @@ import swervelib.SwerveDrive;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Pose2d;
 
@@ -32,9 +37,12 @@ import java.util.List;
 import java.util.Optional;
 
 import com.pathplanner.lib.path.GoalEndState;
+import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
+import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
@@ -50,7 +58,8 @@ import frc.robot.Constants.DriveConstants;
 public class SwerveSubsystem extends SubsystemBase {
   public int driveType;
   private SwerveDrive m_swerveDrive; // create variable so the whole class can see it
-
+  
+  public RobotConfig config;
     
   Optional<Pose3d> tag0 = fieldLayout.getTagPose(1);
     
@@ -101,28 +110,7 @@ public class SwerveSubsystem extends SubsystemBase {
     
   }
 
-  public Command driveToAprilTag() {
-    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
-      getPose2d(),
-      fieldLayout.getTagPose(0).get().toPose2d()
-    );
 
-    PathConstraints constraints = new PathConstraints(3.0, 3.0, 2 * Math.PI, 4 * Math.PI); // The constraints for this path.
-    // PathConstraints constraints = PathConstraints.unlimitedConstraints(12.0); // You can also use unlimited constraints, only limited by motor torque and nominal battery voltage
-
-    // Create the path using the waypoints created above
-    PathPlannerPath path = new PathPlannerPath(
-            waypoints,
-            constraints,
-            null, // The ideal starting state, this is only relevant for pre-planned paths, so can be null for on-the-fly paths.
-            new GoalEndState(0.0, Rotation2d.fromDegrees(-90)) // Goal end state. You can set a holonomic rotation here. If using a differential drivetrain, the rotation will have no effect.
-    );
-
-    // Prevent the path from being flipped if the coordinates are already correct >no really sherlock you think this is necessary
-    path.preventFlipping = true;
-
-    return AutoBuilder.followPath(path);
-  }
 
   public void driveRelative(ChassisSpeeds velocity) { // driving relative to the robot
 
@@ -164,7 +152,6 @@ public class SwerveSubsystem extends SubsystemBase {
   public void setupPathPlanner() {
     // Load the RobotConfig from the GUI settings. You should probably
     // store this in your Constants file
-    RobotConfig config;
     try {
       config = RobotConfig.fromGUISettings();
 

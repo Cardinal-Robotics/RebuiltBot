@@ -60,7 +60,7 @@ public class RobotContainer {
   Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
   
   Command driveRobotOrientedAngularVelocity  = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
-  Command driveAutoAlign = m_swerveSubsystem.driveToAprilTag();
+  Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
 
   private void configureBindings() {
     m_driverController.a().toggleOnTrue(driveRobotOrientedAngularVelocity);
