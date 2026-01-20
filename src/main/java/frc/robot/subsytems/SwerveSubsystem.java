@@ -64,7 +64,7 @@ public class SwerveSubsystem extends SubsystemBase {
   Optional<Pose3d> tag0 = fieldLayout.getTagPose(1);
     
   public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(
-            AprilTagFields.k2025ReefscapeWelded);
+            AprilTagFields.k2026RebuiltWelded);
 
   public SwerveSubsystem() {
     driveType = 0;
@@ -86,8 +86,9 @@ public class SwerveSubsystem extends SubsystemBase {
     } catch (IOException e) { // if we get this error then:
       throw new RuntimeException(e);
     }
+    
 
-    Pose2d kInitialBlueRobotPose = new Pose2d(7.469, 7.457, Rotation2d.k180deg);
+    Pose2d kInitialBlueRobotPose = new Pose2d(12.95, 0.6, Rotation2d.kZero);
 
     m_swerveDrive.field.setRobotPose(kInitialBlueRobotPose);
     m_swerveDrive.resetOdometry(kInitialBlueRobotPose);
@@ -95,7 +96,8 @@ public class SwerveSubsystem extends SubsystemBase {
     setupPathPlanner();
 
     SmartDashboard.putData(m_swerveDrive.field);
-
+    SmartDashboard.putNumber("x", 0);
+    SmartDashboard.putNumber("y", 0);
   }
 
   @Override
@@ -104,7 +106,10 @@ public class SwerveSubsystem extends SubsystemBase {
     Pose2d position = m_swerveDrive.getPose();
     Logger.recordOutput("YAGSL", position);
 
-    
+    double x = SmartDashboard.getNumber("x", 0);
+    double y = SmartDashboard.getNumber("y", 0);
+    Pose2d testPose = new Pose2d(x,y, Rotation2d.kZero);
+    Logger.recordOutput("TestPosition", testPose);
 
 
     

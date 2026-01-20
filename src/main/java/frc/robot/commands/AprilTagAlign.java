@@ -48,7 +48,7 @@ public class AprilTagAlign extends Command {
   public void initialize() {
     m_timer.start();
     targetID = m_visionSubsystem.getBestTargetId();
-    m_finished = true;
+    if(targetID == -1) m_finished = true;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -57,15 +57,14 @@ public class AprilTagAlign extends Command {
     // get a function that gets the ID of the best tag
     Logger.recordOutput("ID", targetID);
 
-    if(targetID == -1) {
-      m_finished = true;
-      return;
-    }
     // this function gets the offset based off of the ID we get
+    if (targetID == -1) return; 
+
+    System.out.println(targetID);
 
     Pose2d targetPose = m_swerveSubsystem.fieldLayout.getTagPose(targetID).get().toPose2d()
     .plus(getApriltagOffset(targetID)); // love hardcoding
-
+    
     driveToAprilTag(m_timer.get(), targetPose);
   }
 

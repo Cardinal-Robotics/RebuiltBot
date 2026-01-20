@@ -94,6 +94,9 @@ public class VisionSubsystem extends SubsystemBase {
   
   @Override
   public void periodic() {
+
+
+
     var results = camera.getLatestResult(); // all the info about the detected targets
   
     boolean hasTargets = results.hasTargets(); // is there any valid targets??
