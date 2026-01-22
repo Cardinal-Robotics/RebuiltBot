@@ -104,6 +104,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     CommandScheduler.getInstance().run();
-    SimulatedArena.getInstance().simulationPeriodic();
+    //SimulatedArena.getInstance().simulationPeriodic();
   }
 }

@@ -88,10 +88,10 @@ public class SwerveSubsystem extends SubsystemBase {
     }
     
 
-    Pose2d kInitialBlueRobotPose = new Pose2d(12.95, 0.6, Rotation2d.kZero);
+    Pose2d kInitialRedRobotPose = new Pose2d(12.95, 0.6, Rotation2d.kZero);
 
-    m_swerveDrive.field.setRobotPose(kInitialBlueRobotPose);
-    m_swerveDrive.resetOdometry(kInitialBlueRobotPose);
+    m_swerveDrive.field.setRobotPose(kInitialRedRobotPose);
+    m_swerveDrive.resetOdometry(kInitialRedRobotPose);
 
     setupPathPlanner();
 
@@ -103,18 +103,15 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() { // Luke Vu is the most Luke Vu guy I know (except for Luke Vu et al.)
     // This method will be called once per scheduler run
-    Pose2d position = m_swerveDrive.getPose();
-    Logger.recordOutput("YAGSL", position);
-
-    double x = SmartDashboard.getNumber("x", 0);
-    double y = SmartDashboard.getNumber("y", 0);
-    Pose2d testPose = new Pose2d(x,y, Rotation2d.kZero);
-    Logger.recordOutput("TestPosition", testPose);
-
-
-    
+    Pose2d pose = m_swerveDrive.getPose();
+    Logger.recordOutput("YAGSL", pose);
   }
 
+  @Override
+  public void simulationPeriodic() {
+    Pose2d simulationPose = m_swerveDrive.getSimulationDriveTrainPose().orElseGet(() -> Pose2d.kZero);
+    m_swerveDrive.swerveDrivePoseEstimator.resetPose(simulationPose);
+  }
 
 
   public void driveRelative(ChassisSpeeds velocity) { // driving relative to the robot

@@ -62,17 +62,32 @@ public class AprilTagAlign extends Command {
 
     System.out.println(targetID);
 
-    Pose2d targetPose = m_swerveSubsystem.fieldLayout.getTagPose(targetID).get().toPose2d()
-    .plus(getApriltagOffset(targetID)); // love hardcoding
+    Pose2d targetPose = getApriltagOffset(targetID); // love hardcoding
     
     driveToAprilTag(m_timer.get(), targetPose);
   }
 
-  public Transform2d getApriltagOffset(int ID) {
-    Transform2d offset = new Transform2d(0, 0, Rotation2d.kZero);
+  public Pose2d getApriltagOffset(int ID) {
+    Pose2d offset = new Pose2d(0, 0, Rotation2d.kZero);
+
+    double x = SmartDashboard.getNumber("x", 0);
+    double y = SmartDashboard.getNumber("y", 0);
+
     int targetID = ID;
     switch(targetID) {
-  
+      case 9:
+      case 10:
+      offset = new Pose2d(13.87, 4, Rotation2d.kZero);
+      break;
+      case 5:
+      case 8:
+      offset = new Pose2d(13.38,2.36, new Rotation2d(140));
+      break;
+      case 11:
+      case 2:
+      offset = new Pose2d(x,y, Rotation2d.kZero);
+      break;
+
     }
     return offset;
   }
@@ -95,7 +110,7 @@ public class AprilTagAlign extends Command {
       new IdealStartingState(0, m_swerveSubsystem.getPose2d().getRotation()),
       new GoalEndState(
         0.0,
-         targetPose.getRotation().plus(new Rotation2d(Math.PI)))
+         targetPose.getRotation())
     );
 
     PPHolonomicDriveController controller = 
