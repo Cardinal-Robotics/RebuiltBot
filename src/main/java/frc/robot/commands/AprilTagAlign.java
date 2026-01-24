@@ -81,7 +81,7 @@ public class AprilTagAlign extends Command {
       break;
       case 5:
       case 8:
-      offset = new Pose2d(13.38,2.36, new Rotation2d(140));
+      offset = new Pose2d(13.38,2.36, new Rotation2d(Math.toRadians(140 + 180)));
       break;
       case 11:
       case 2:

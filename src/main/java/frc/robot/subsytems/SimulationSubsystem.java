@@ -4,6 +4,7 @@
 
 package frc.robot.subsytems;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
@@ -26,12 +27,17 @@ public class SimulationSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {
+  public void simulationPeriodic() {
   
-/*         List<GamePiece> algaeGamePieces = SimulatedArena.getInstance().getGamePiecesByType("Algae");
-        List<GamePiece> coralGamePieces = SimulatedArena.getInstance().getGamePiecesByType("Coral");
-        Logger.recordOutput("FieldSimulation/Algae", algaeGamePieces.toArray(Pose3d[]::new));
-        Logger.recordOutput("FieldSimulation/Coral", coralGamePieces.toArray(Pose3d[]::new)); */
+        List<GamePiece> fuelGamePieces = SimulatedArena.getInstance().getGamePiecesByType("Fuel");
+
+        List<Pose3d> poses = new ArrayList<>();
+        
+        for (int i=0; i < fuelGamePieces.size(); i++) {
+          poses.add(i, fuelGamePieces.get(i).getPose3d());
+        }
+
+        Logger.recordOutput("FieldSimulation/Fuel", poses.toArray(Pose3d[]::new));
 
   }
 }

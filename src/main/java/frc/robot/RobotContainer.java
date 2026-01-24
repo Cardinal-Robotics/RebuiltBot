@@ -1,5 +1,7 @@
 package frc.robot;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.math.geometry.Translation2d;
@@ -37,12 +39,17 @@ public class RobotContainer {
 
   public RobotContainer() {
     configureBindings();
-    m_swerveSubsystem.setDefaultCommand(driveFieldOrientedAngularVelocity);
   }
 
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
       () -> m_driverController.getLeftY() * -1,
       () -> m_driverController.getLeftX() * -1)
+      .headingWhile(true)
+      .deadband(OperatorConstants.kDEADBAND)
+      .scaleTranslation(0.8)
+      .allianceRelativeControl(true);
+
+  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
       .withControllerHeadingAxis(
           () -> m_driverController.getRightX()
               * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1)
@@ -50,14 +57,6 @@ public class RobotContainer {
           () -> m_driverController.getRightY()
               * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1)
               * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1))
-      .headingWhile(true)
-      .deadband(OperatorConstants.kDEADBAND)
-      .scaleTranslation(0.8)
-      .allianceRelativeControl(true);
-
-  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
-      .withControllerHeadingAxis(m_driverController::getRightX,
-          m_driverController::getRightY)
       .headingWhile(true);
 
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
@@ -72,7 +71,10 @@ public class RobotContainer {
   Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
 
   private void configureBindings() {
-    m_driverController.a().toggleOnTrue(driveRobotOrientedAngularVelocity);
+    m_swerveSubsystem.setDefaultCommand(driveFieldOritentedDirectAngle);
+
+    m_driverController.a().toggleOnTrue(driveRobotOrientedAngularVelocity
+      .andThen(() -> Logger.recordOutput("null", 0)));
     m_driverController.b().toggleOnTrue(driveAutoAlign);
 
     /*
