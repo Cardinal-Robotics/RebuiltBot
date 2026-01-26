@@ -69,7 +69,7 @@ public class ShooterAlign extends Command {
       new Pose2d(2.272, 5.616, new Rotation2d(Math.toRadians(-32.56 + 180))),
       new Pose2d(2.345, 4.119, new Rotation2d(Math.toRadians(-3.02 + 180))),
       new Pose2d(2.607, 2.313, new Rotation2d(Math.toRadians(41.8 + 180))),
-      new Pose2d(3.257, 7.308, new Rotation2d(Math.toRadians(72.26 + 180)))
+      new Pose2d(3.257, 0.809, new Rotation2d(Math.toRadians(72.26 + 180)))
     };
 
     Pose2d closestPose = shootPoses[0];
