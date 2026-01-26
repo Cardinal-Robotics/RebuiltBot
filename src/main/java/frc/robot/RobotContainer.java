@@ -18,6 +18,7 @@ import swervelib.SwerveInputStream;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AprilTagAlign;
+import frc.robot.commands.ShooterAlign;
 import frc.robot.Constants.DriveConstants;;
 
 public class RobotContainer {
@@ -68,7 +69,9 @@ public class RobotContainer {
   Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
 
   Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
+
   Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
+  Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_visionSubsystem);
 
   private void configureBindings() {
     m_swerveSubsystem.setDefaultCommand(driveFieldOritentedDirectAngle);
@@ -76,6 +79,7 @@ public class RobotContainer {
     m_driverController.a().toggleOnTrue(driveRobotOrientedAngularVelocity
       .andThen(() -> Logger.recordOutput("null", 0)));
     m_driverController.b().toggleOnTrue(driveAutoAlign);
+    m_driverController.y().toggleOnTrue(driveShooterAlign); //temporary button
 
     /*
      * m_driverController.x().onTrue(Commands.runOnce(() -> {

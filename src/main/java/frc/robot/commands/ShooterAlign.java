@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.Rotation;
+
 import java.util.List;
 
 import com.pathplanner.lib.config.PIDConstants;
@@ -29,74 +31,71 @@ import frc.robot.subsytems.SwerveSubsystem;
 import frc.robot.subsytems.VisionSubsystem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class AprilTagAlign extends Command {
+public class ShooterAlign extends Command {
   Timer m_timer = new Timer();
   SwerveSubsystem m_swerveSubsystem;
   VisionSubsystem m_visionSubsystem;
   private int targetID = -1;
   boolean m_finished = false;
 
-  public AprilTagAlign(SwerveSubsystem swerveSubsystem, VisionSubsystem visionSubsystem) {
+  public ShooterAlign(SwerveSubsystem swerveSubsystem, VisionSubsystem visionSubsystem) {
     addRequirements(swerveSubsystem);
 
     m_swerveSubsystem = swerveSubsystem;
     m_visionSubsystem = visionSubsystem;
   }
 
-  // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     m_timer.start();
-    targetID = m_visionSubsystem.getBestTargetId();
-    if(targetID == -1) m_finished = true;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // get a function that gets the ID of the best tag
-    Logger.recordOutput("ID", targetID);
+    Logger.recordOutput("Shooter", 1);
 
-    // this function gets the offset based off of the ID we get
-    if (targetID == -1) return; 
+    Pose2d targetPose = getShootPose();
 
-    System.out.println(targetID);
+    driveToShootPose(m_timer.get(), targetPose);
 
-    Pose2d targetPose = getApriltagOffset(targetID); // love hardcoding
-    
-    driveToAprilTag(m_timer.get(), targetPose);
   }
 
-  public Pose2d getApriltagOffset(int ID) { // IT IS NOT OFFSET ANYMORE ITS A GLOBAL POSITION
-    Pose2d offset = new Pose2d(0, 0, Rotation2d.kZero);
+  public Pose2d getShootPose() {
+    Pose2d robotPose = m_swerveSubsystem.getPose2d();
 
-    double x = SmartDashboard.getNumber("x", 0);
-    double y = SmartDashboard.getNumber("y", 0);
+    Pose2d[] shootPoses = { // the five shooting positions
+      new Pose2d(3.257, 7.308, new Rotation2d(Math.toRadians(-69.19 + 180))),
+      new Pose2d(2.272, 5.616, new Rotation2d(Math.toRadians(-32.56 + 180))),
+      new Pose2d(2.345, 4.119, new Rotation2d(Math.toRadians(-3.02 + 180))),
+      new Pose2d(2.607, 2.313, new Rotation2d(Math.toRadians(41.8 + 180))),
+      new Pose2d(3.257, 7.308, new Rotation2d(Math.toRadians(72.26 + 180)))
+    };
 
-    int targetID = ID;
-    switch(targetID) {
-      case 9:
-      case 10:
-      offset = new Pose2d(13.87, 4, Rotation2d.kZero);
-      break;
-      case 5:
-      case 8:
-      offset = new Pose2d(13.38,2.36, new Rotation2d(Math.toRadians(140 + 180)));
-      break;
-      case 11:
-      case 2:
-      offset = new Pose2d(x,y, Rotation2d.kZero);
-      break;
+    Pose2d closestPose = shootPoses[0];
+    double minDistance = Double.MAX_VALUE;
 
+    for (Pose2d pose : shootPoses) { //chooses the best of the 5 poses
+        double dx = pose.getX() - robotPose.getX();
+        double dy = pose.getY() - robotPose.getY();
+        double distance = Math.hypot(dx, dy); // sqrt(dx^2 + dy^2)
+
+        if (distance < minDistance) {
+            minDistance = distance;
+            closestPose = pose;
+        }
     }
-    return offset;
+
+    Logger.recordOutput("ShootPose", closestPose);
+
+    return closestPose;
+
   }
 
-  public void driveToAprilTag(double seconds, Pose2d targetPose) {
+  public void driveToShootPose(double seconds, Pose2d targetPose) {
     List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
       m_swerveSubsystem.getPose2d(),
-      targetPose
-    );
+      targetPose);
 
   PathConstraints constraints = new PathConstraints(
     3.0,
@@ -137,14 +136,13 @@ public class AprilTagAlign extends Command {
     m_swerveSubsystem.driveRelative(speeds);
   }
 
-  // Called once the command ends or is interrupted.
+
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_finished;
+    return false;
   }
 }
