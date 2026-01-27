@@ -1,9 +1,8 @@
 package frc.robot; //These are the imports from reefcape FYI
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.geometry.*;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,10 +34,10 @@ public final class Constants {
         public static final double kDAngular = 0;
 
         public static final PPHolonomicDriveController kPathDriveController = new PPHolonomicDriveController(
-            new PIDConstants(DriveConstants.kPTrans, DriveConstants.kITrans, DriveConstants.kDTrans), // Translation
-                                                                                                      // PID
-            new PIDConstants(DriveConstants.kPAngular, DriveConstants.kIAngular,
-                    DriveConstants.kDAngular));
+                // Translation PID
+                new PIDConstants(3, 0, 0),
+                // Rotation PID
+                new PIDConstants(5, 0, 0));
     }
 
 }

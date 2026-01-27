@@ -4,16 +4,16 @@
 
 package frc.robot.subsytems;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.gamepieces.GamePiece;
+import swervelib.simulation.ironmaple.simulation.SimulatedArena;
+
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.geometry.Pose3d;
 
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SimulationSubsystem extends SubsystemBase {
   SimulatedArena m_arena = SimulatedArena.getInstance();
@@ -28,16 +28,14 @@ public class SimulationSubsystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-  
-        List<GamePiece> fuelGamePieces = SimulatedArena.getInstance().getGamePiecesByType("Fuel");
+    List<GamePiece> fuelGamePieces = SimulatedArena.getInstance().getGamePiecesByType("Fuel");
 
-        List<Pose3d> poses = new ArrayList<>();
-        
-        for (int i=0; i < fuelGamePieces.size(); i++) {
-          poses.add(i, fuelGamePieces.get(i).getPose3d());
-        }
+    List<Pose3d> poses = new ArrayList<>();
 
-        Logger.recordOutput("FieldSimulation/Fuel", poses.toArray(Pose3d[]::new));
+    for (int i = 0; i < fuelGamePieces.size(); i++) {
+      poses.add(i, fuelGamePieces.get(i).getPose3d());
+    }
 
+    Logger.recordOutput("FieldSimulation/Fuel", poses.toArray(Pose3d[]::new));
   }
 }

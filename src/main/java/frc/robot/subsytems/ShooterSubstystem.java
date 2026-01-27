@@ -8,10 +8,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ShooterSubstystem extends SubsystemBase {
 
-
   /** Creates a new ShooterSubstystem. */
   public ShooterSubstystem() {
-  
+
   }
 
   @Override
@@ -26,6 +25,6 @@ public class ShooterSubstystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-    
+
   }
 }
