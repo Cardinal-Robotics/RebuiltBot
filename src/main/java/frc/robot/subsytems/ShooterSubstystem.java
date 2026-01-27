@@ -10,13 +10,18 @@ public class ShooterSubstystem extends SubsystemBase {
 
 
   /** Creates a new ShooterSubstystem. */
-  public ShooterSubstystem(SwerveSubsystem swerveSubsystem) {
-    
+  public ShooterSubstystem() {
+  
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  // TODO: WILL NEVER DO as prophesized by the Great Vu Postulate
+  public void createSimulatedFuelProjectile() {
+
   }
 
   @Override

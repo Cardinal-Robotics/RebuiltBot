@@ -138,6 +138,56 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
+
+  /**
+   * seconds - the time along the path
+   * targetPose - the target position
+   */
+  public void calculateAlignSpeeds(double seconds, Pose2d targetPose) {
+    List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(
+      getPose2d(),
+      targetPose
+    );
+
+  PathConstraints constraints = new PathConstraints(
+    3.0,
+    3.0,
+    2 * Math.PI,
+    4 * Math.PI); // The constraints for this path.
+
+    PathPlannerPath path = new PathPlannerPath(
+      waypoints,
+      constraints,
+      new IdealStartingState(0, getPose2d().getRotation()),
+      new GoalEndState(
+        0.0,
+         targetPose.getRotation())
+    );
+
+    PPHolonomicDriveController controller = 
+      new PPHolonomicDriveController(
+        new PIDConstants(1, 0, 0),
+        new PIDConstants(1, 0, 0)
+        );
+
+    // this is just charlie trying to do it so if its wrong delete it
+    ChassisSpeeds startingSpeeds = getSwerveDrive().getRobotVelocity();
+    Rotation2d startingRotation = getPose2d().getRotation();
+
+    PathPlannerTrajectory trajectory = new PathPlannerTrajectory(
+      path,
+      startingSpeeds,
+      startingRotation,
+      config
+      // ??? we need some sort of robot config here but I am not completely sure how to do that
+    );
+
+    PathPlannerTrajectoryState trajectoryState = trajectory.sample(seconds);
+
+    ChassisSpeeds speeds = controller.calculateRobotRelativeSpeeds(getPose2d(), trajectoryState);
+    driveRelative(speeds);
+  }
+
   public void toggleDriveType() { //there you are hahahah
     driveType = (driveType == 0) ? 1 : 0;
     System.out.println("Drive type toggled to " + (driveType == 0 ? "FIELD" : "RELATIVE"));
@@ -149,6 +199,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Pose2d getPose2d() {
     return m_swerveDrive.getPose();
+  }
+
+  public ChassisSpeeds getFieldVelocity() {
+    return m_swerveDrive.getFieldVelocity();
   }
 
   public void setupPathPlanner() {

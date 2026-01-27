@@ -11,21 +11,18 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.subsytems.SimulationSubsystem;
-import frc.robot.subsytems.SwerveSubsystem;
-import frc.robot.subsytems.VisionSubsystem;
 import swervelib.SwerveInputStream;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.AprilTagAlign;
-import frc.robot.commands.ShooterAlign;
-import frc.robot.Constants.DriveConstants;;
+import frc.robot.subsytems.*;
+import frc.robot.Constants.*;
+import frc.robot.commands.*;
 
 public class RobotContainer {
 
   // SUBSYSTEMS
   // -----------------------------------------------------------------------------------
   private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(); // awesome
+  private final ShooterSubstystem m_shooterSubsystem = new ShooterSubstystem(); // awesome
   private final SimulationSubsystem m_smulationSubsystem = new SimulationSubsystem();
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveSubsystem);
   // -----------------------------------------------------------------------------------
@@ -72,14 +69,21 @@ public class RobotContainer {
 
   Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
   Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_visionSubsystem);
+  Command shootyBoi = new Shoot(m_shooterSubsystem, m_swerveSubsystem);
 
   private void configureBindings() {
     m_swerveSubsystem.setDefaultCommand(driveFieldOritentedDirectAngle);
 
     m_driverController.a().toggleOnTrue(driveRobotOrientedAngularVelocity
-      .andThen(() -> Logger.recordOutput("null", 0)));
-    m_driverController.b().toggleOnTrue(driveAutoAlign);
-    m_driverController.y().toggleOnTrue(driveShooterAlign); //temporary button
+        .beforeStarting(() -> {
+          Logger.recordOutput("Robot Relative", true);
+        }).finallyDo(() -> {
+          Logger.recordOutput("Robot Relative", false);
+        }));
+
+    m_driverController.y().toggleOnTrue(driveAutoAlign);
+    m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button
+    m_driverController.rightTrigger().toggleOnTrue(shootyBoi);
 
     /*
      * m_driverController.x().onTrue(Commands.runOnce(() -> {
