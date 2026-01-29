@@ -31,24 +31,7 @@ public class Shoot extends Command {
   @Override
   public void initialize() {
     if (Robot.isSimulation()) { // "units are a man's worst enemy" - Charlie Malerich 1/26/2026
-      Pose2d currentPosition = m_swerveSubstystem.getPose2d();
-      Pose2d targetPosition = new Pose2d(4.5, 4.03, Rotation2d.kZero);
-
-
-      double hubHeight = Meters.convertFrom(72, Inches) - 0.45;
-      
-      double dx = currentPosition.getX() - targetPosition.getX();
-      double dy = currentPosition.getY() - targetPosition.getY();
-      double hubDistance = Math.hypot(dx, dy) - 0.2; // sqrt(dx^2 + dy^2)
-      
-      double sinSquared = Math.pow(Math.sin(Math.toRadians(30)), 2);
-
-      double v_0x2 = Math.pow(hubDistance / (2 * Math.cos(Math.toRadians(30))), 2);
-      double v_0y2 = (hubHeight + Math.pow((0.5 * 9.8 * 4), 2) / (4 * sinSquared));
-
-      double initialVelocity = Math.sqrt(v_0x2 + v_0y2); // triangle gang YESSIR
-
-      Logger.recordOutput("Initial Velocity", initialVelocity);
+      double v0 = m_shooterSubstystem.getIdealShootingVelocity();
 
       // 0.2x, 0.45y
       RebuiltFuelOnFly fuelOnFly = new RebuiltFuelOnFly(
@@ -57,8 +40,8 @@ public class Shoot extends Command {
           m_swerveSubstystem.getFieldVelocity(),
           m_swerveSubstystem.getPose2d().getRotation().plus(Rotation2d.fromDegrees(180)),
           Distance.ofBaseUnits(0.45, Meters),
-          LinearVelocity.ofBaseUnits(initialVelocity, MetersPerSecond), // V sub 0 = sqrt(x^2/(2s)^2 + (72 in + ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
-          Angle.ofBaseUnits(-30, Degrees));
+          LinearVelocity.ofBaseUnits(v0, MetersPerSecond), // V sub 0 = sqrt(x^2/(2s)^2 + (72 in + ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
+          Angle.ofBaseUnits(Math.toRadians(65), Radians));
 
       fuelOnFly
           // Configure callbacks to visualize the flight trajectory of the projectile

@@ -21,7 +21,7 @@ public class RobotContainer {
   // SUBSYSTEMS
   // -----------------------------------------------------------------------------------
   private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(); // awesome
-  private final ShooterSubstystem m_shooterSubsystem = new ShooterSubstystem(); // awesome
+  private final ShooterSubstystem m_shooterSubsystem = new ShooterSubstystem(m_swerveSubsystem); // awesome
   private final SimulationSubsystem m_smulationSubsystem = new SimulationSubsystem();
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveSubsystem);
   // -----------------------------------------------------------------------------------
