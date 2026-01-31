@@ -6,7 +6,7 @@ package frc.robot.subsytems;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
-
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -25,6 +25,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.system.LinearSystem;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
@@ -45,33 +47,38 @@ public class ShooterSubstystem extends SubsystemBase {
     SparkMaxConfig shootConfig = new SparkMaxConfig();
 
     shootConfig.idleMode(IdleMode.kBrake);
-    shootConfig.closedLoop.pid(0, 0, 0);
+    shootConfig.closedLoop.pid(0.0005, 0.001, 0);
     m_shootMotor.configure(shootConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     m_shootMotor.getEncoder();
 
     m_swerveSubstystem = swerveSubsystem;
     SmartDashboard.putNumber("Shooty Speed", 0);
+
   }
 
   @Override
   public void periodic() {
+    if (!DriverStation.isEnabled()) m_shootMotor.getClosedLoopController().setIAccum(0);
+
+
     // This method will be called once per scheduler run
-    double speed = SmartDashboard.getNumber("Shooty Speed", 0);
-    m_shootMotor.getClosedLoopController().setSetpoint(speed, ControlType.kVelocity);
-    Logger.recordOutput("Shooter/Speed", m_shootMotor.getEncoder().getVelocity());
+      double theta = Math.toRadians(65); // FIXED SHOOTER ANGLE
+    setTargetSpeedRPM(getIdealShootingRotationalVelocity(theta));
+    Logger.recordOutput("Shooter/SetpointRPM", m_shootMotor.getClosedLoopController().getSetpoint());
+    Logger.recordOutput("Shooter/SimRPM", m_flywheelSim.getAngularVelocityRPM());
   }
 
-  public double getIdealShootingVelocity() {
-    Pose2d currentPosition = m_swerveSubstystem.getPose2d();
+  public double getIdealShootingRotationalVelocity(double theta) {
+      Pose2d currentPosition = m_swerveSubstystem.getPose2d();
       Pose2d targetPosition = new Pose2d(4.5, 4.03, Rotation2d.kZero);
-
+      Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
+      if (alliance == Alliance.Red)
+        targetPosition = new Pose2d(12.1, 4.03, Rotation2d.kZero);
 
       double g = 9.8;
       double dx = targetPosition.getTranslation().getDistance(currentPosition.getTranslation());
       double dy = Meters.convertFrom(72, Inches) - 0.45 + 0.2;
-
-      double theta = Math.toRadians(65); // FIXED SHOOTER ANGLE
 
       double cos = Math.cos(theta);
       double tan = Math.tan(theta);
@@ -79,14 +86,13 @@ public class ShooterSubstystem extends SubsystemBase {
       double denom = 2 * cos * cos * (dx * tan - dy);
 
       if (denom <= 0) {
-          Logger.recordOutput("Shooter/Error", "Target unreachable at this angle");
+        Logger.recordOutput("Shooter/Error", "Target unreachable at this angle");
       }
 
       double v0Squared = ((g * dx * dx) / denom);
       double v0 = Math.sqrt(v0Squared);
-
-      Logger.recordOutput("Shooter/v0", v0);
-      return v0;
+      double rotationalVelocity = v0 / (2 * Math.PI * Meters.convertFrom(2, Inches)) * 60;
+      return rotationalVelocity;
   }
 
   // TODO: WILL NEVER DO as prophesized by the Great Vu Postulate
@@ -102,4 +108,13 @@ public class ShooterSubstystem extends SubsystemBase {
     m_shootMotorSim.iterate(m_flywheelSim.getAngularVelocityRPM(), RobotController.getInputVoltage(), timestep);
     RoboRioSim.setVInVoltage(BatterySim.calculateDefaultBatteryLoadedVoltage(m_shootMotor.getOutputCurrent()));; // I understand this for sure
   }
+
+  public double getVelocityRPM() {
+    return m_flywheelSim.getAngularVelocityRPM();
+  }
+
+  public void setTargetSpeedRPM(double targetSpeed) {
+    m_shootMotor.getClosedLoopController().setSetpoint(targetSpeed, ControlType.kVelocity);
+  }
+
 }

@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -26,17 +28,15 @@ public class RobotContainer {
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveSubsystem);
   // -----------------------------------------------------------------------------------
 
-  // COMMANDS
-  // -----------------------------------------------------------------------------------
-
-  // -----------------------------------------------------------------------------------
-
   private final CommandXboxController m_driverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
 
   public RobotContainer() {
     configureBindings();
   }
+
+  // COMMANDS
+  // -----------------------------------------------------------------------------------
 
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
       () -> m_driverController.getLeftY() * -1,
@@ -66,9 +66,18 @@ public class RobotContainer {
 
   Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
 
+  SwerveInputStream driveAimRedHub = driveDirectAngle.copy().aim(new Pose2d(12.1, 4.03, Rotation2d.kZero)).aimWhile(true);
+  SwerveInputStream driveAimBlueHub = driveDirectAngle.copy().aim(new Pose2d(4.5, 4.03, Rotation2d.kZero)).aimWhile(true);
+
+  Command driveFieldOrientedRedHub = m_swerveSubsystem.driveFieldOriented(driveAimRedHub);
+
+  Command driveFieldOrientedBlueHub = m_swerveSubsystem.driveFieldOriented(driveAimBlueHub);
+
   Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
   Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_visionSubsystem);
   Command shootyBoi = new Shoot(m_shooterSubsystem, m_swerveSubsystem);
+
+  // -----------------------------------------------------------------------------------
 
   private void configureBindings() {
     m_swerveSubsystem.setDefaultCommand(driveFieldOritentedDirectAngle);
@@ -79,6 +88,10 @@ public class RobotContainer {
         }).finallyDo(() -> {
           Logger.recordOutput("Robot Relative", false);
         }));
+    m_driverController.x().and(
+      () -> DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Red)).toggleOnTrue(driveFieldOrientedRedHub);
+    m_driverController.x().and(
+      () -> DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue)).toggleOnTrue(driveFieldOrientedBlueHub);
 
     m_driverController.y().toggleOnTrue(driveAutoAlign);
     m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button

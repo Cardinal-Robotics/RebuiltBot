@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.measure.*; // this is peak
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -31,29 +33,12 @@ public class Shoot extends Command {
   @Override
   public void initialize() {
     if (Robot.isSimulation()) { // "units are a man's worst enemy" - Charlie Malerich 1/26/2026
-      Pose2d currentPosition = m_swerveSubstystem.getPose2d();
-      Pose2d targetPosition = new Pose2d(4.5, 4.03, Rotation2d.kZero);
-
-
-      double g = 9.8;
-      double dx = targetPosition.getTranslation().getDistance(currentPosition.getTranslation());
-      double dy = Meters.convertFrom(72, Inches) - 0.45 + 0.2;
-
       double theta = Math.toRadians(65); // FIXED SHOOTER ANGLE
 
-      double cos = Math.cos(theta);
-      double tan = Math.tan(theta);
-
-      double denom = 2 * cos * cos * (dx * tan - dy);
-
-      if (denom <= 0) {
-          Logger.recordOutput("Shooter/Error", "Target unreachable at this angle");
-      }
-
-      double v0Squared = ((g * dx * dx) / denom);
-      double v0 = Math.sqrt(v0Squared);
-
+      double v0 = m_shooterSubstystem.getIdealShootingRotationalVelocity(theta);
       Logger.recordOutput("Shooter/v0", v0);
+
+      m_shooterSubstystem.setTargetSpeedRPM(v0);
 
       // 0.2x, 0.45y
       RebuiltFuelOnFly fuelOnFly = new RebuiltFuelOnFly(
@@ -62,7 +47,8 @@ public class Shoot extends Command {
           m_swerveSubstystem.getFieldVelocity(),
           m_swerveSubstystem.getPose2d().getRotation().plus(Rotation2d.fromDegrees(180)),
           Distance.ofBaseUnits(0.45, Meters),
-          LinearVelocity.ofBaseUnits(v0, MetersPerSecond), // V sub 0 = sqrt(x^2/(2s)^2 + (72 in + ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
+          LinearVelocity.ofBaseUnits(m_shooterSubstystem.getVelocityRPM() * (2 * Math.PI * Meters.convertFrom(2, Inches)) / 60, MetersPerSecond), // V sub 0 = sqrt(x^2/(2s)^2 + (72 in +
+                                                           // ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
           Angle.ofBaseUnits(theta, Radians));
 
       fuelOnFly
