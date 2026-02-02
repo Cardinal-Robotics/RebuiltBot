@@ -53,18 +53,26 @@ public class RobotContainer {
               * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1),
           () -> m_driverController.getRightY()
               * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1)
-              * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1))
+              * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1));
+
+    SwerveInputStream driveHubLocked = driveAngularVelocity.copy()
+      .withControllerHeadingAxis(
+         () -> Math.sin(m_shooterSubsystem.getIdealShooterConditions()[1]),
+         () -> Math.cos(m_shooterSubsystem.getIdealShooterConditions()[1]))
       .headingWhile(true);
 
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
       .allianceRelativeControl(false)
       .withControllerRotationAxis(() -> m_driverController.getRightX() * -1);
 
+      
+
   Command driveFieldOritentedDirectAngle = m_swerveSubsystem.driveFieldOriented(driveDirectAngle);
 
   Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
 
   Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
+  Command driveRobotOrientedHubLocked = m_swerveSubsystem.driveFieldOriented(driveHubLocked);
 
   SwerveInputStream driveAimRedHub = driveDirectAngle.copy().aim(new Pose2d(12.1, 4.03, Rotation2d.kZero)).aimWhile(true);
   SwerveInputStream driveAimBlueHub = driveDirectAngle.copy().aim(new Pose2d(4.5, 4.03, Rotation2d.kZero)).aimWhile(true);
@@ -88,10 +96,7 @@ public class RobotContainer {
         }).finallyDo(() -> {
           Logger.recordOutput("Robot Relative", false);
         }));
-    m_driverController.x().and(
-      () -> DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Red)).toggleOnTrue(driveFieldOrientedRedHub);
-    m_driverController.x().and(
-      () -> DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue)).toggleOnTrue(driveFieldOrientedBlueHub);
+    m_driverController.x().toggleOnTrue(driveRobotOrientedHubLocked);
 
     m_driverController.y().toggleOnTrue(driveAutoAlign);
     m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button

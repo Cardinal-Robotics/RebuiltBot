@@ -60,19 +60,19 @@ public class ShooterAlign extends Command {
     Pose2d robotPose = m_swerveSubsystem.getPose2d();
 
     Pose2d[] blueShootPoses = { // the five shooting positions
-        new Pose2d(3.257, 7.308, new Rotation2d(Math.toRadians(-68 + 180))),
-        new Pose2d(2.272, 5.616, new Rotation2d(Math.toRadians(-32.56 + 180))),
-        new Pose2d(2.345, 4.119, new Rotation2d(Math.toRadians(-3.02 + 180))),
-        new Pose2d(2.607, 2.313, new Rotation2d(Math.toRadians(41.8 + 180))),
-        new Pose2d(3.257, 0.809, new Rotation2d(Math.toRadians(65 + 180)))
+        new Pose2d(3.257, 7.308, new Rotation2d(Math.toRadians(-68))),
+        new Pose2d(2.272, 5.616, new Rotation2d(Math.toRadians(-32.56))),
+        new Pose2d(2.345, 4.119, new Rotation2d(Math.toRadians(-3.02))),
+        new Pose2d(2.607, 2.313, new Rotation2d(Math.toRadians(41.8))),
+        new Pose2d(3.257, 0.809, new Rotation2d(Math.toRadians(65)))
     };
 
     Pose2d[] redShootPoses = {
-        new Pose2d(13.239, 7.209, Rotation2d.fromDegrees(246.2 + 180)),
-        new Pose2d(14.284, 6.352, new Rotation2d(Math.toRadians(223.3 + 180))),
-        new Pose2d(14.612, 4.048, new Rotation2d(Math.toRadians(-179.48 + 180))),
-        new Pose2d(14.368, 2.125, new Rotation2d(Math.toRadians(142.58 + 180))),
-        new Pose2d(13.249, 0.642, new Rotation2d(Math.toRadians(108.54 + 180)))
+        new Pose2d(13.239, 7.209, Rotation2d.fromDegrees(246.2)),
+        new Pose2d(14.284, 6.352, new Rotation2d(Math.toRadians(223.3))),
+        new Pose2d(14.612, 4.048, new Rotation2d(Math.toRadians(-179.48))),
+        new Pose2d(14.368, 2.125, new Rotation2d(Math.toRadians(142.58))),
+        new Pose2d(13.249, 0.642, new Rotation2d(Math.toRadians(108.54)))
     };
 
     Pose2d[] shooterPoses = new Pose2d[] {};

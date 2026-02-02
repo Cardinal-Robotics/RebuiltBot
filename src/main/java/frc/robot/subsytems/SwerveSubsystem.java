@@ -97,9 +97,12 @@ public class SwerveSubsystem extends SubsystemBase {
   public void driveRelative(ChassisSpeeds velocity) { // driving relative to the robot
 
     m_swerveDrive.drive(velocity);
-
   }
 
+/*   public void setRotation() {
+    m_swerveDrive.swerveController.thetaController
+  }
+ */
   public Command driveRelative(Supplier<ChassisSpeeds> velocity) {
     return run(() -> {
       driveRelative(velocity.get()); // runs this function

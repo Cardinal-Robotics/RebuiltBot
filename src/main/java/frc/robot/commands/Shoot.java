@@ -35,17 +35,18 @@ public class Shoot extends Command {
     if (Robot.isSimulation()) { // "units are a man's worst enemy" - Charlie Malerich 1/26/2026
       double theta = Math.toRadians(65); // FIXED SHOOTER ANGLE
 
-      double v0 = m_shooterSubstystem.getIdealShootingRotationalVelocity(theta);
-      Logger.recordOutput("Shooter/v0", v0);
+      double[] conditions = m_shooterSubstystem.getIdealShooterConditions();
+      double w0 = conditions[0];
+      Logger.recordOutput("Shooter/v0", w0);
 
-      m_shooterSubstystem.setTargetSpeedRPM(v0);
+      m_shooterSubstystem.setTargetSpeedRPM(w0);
 
       // 0.2x, 0.45y
       RebuiltFuelOnFly fuelOnFly = new RebuiltFuelOnFly(
           m_swerveSubstystem.getPose2d().getTranslation(),
           new Translation2d(0.2, 0),
           m_swerveSubstystem.getFieldVelocity(),
-          m_swerveSubstystem.getPose2d().getRotation().plus(Rotation2d.fromDegrees(180)),
+          m_swerveSubstystem.getPose2d().getRotation(),
           Distance.ofBaseUnits(0.45, Meters),
           LinearVelocity.ofBaseUnits(m_shooterSubstystem.getVelocityRPM() * (2 * Math.PI * Meters.convertFrom(2, Inches)) / 60, MetersPerSecond), // V sub 0 = sqrt(x^2/(2s)^2 + (72 in +
                                                            // ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
