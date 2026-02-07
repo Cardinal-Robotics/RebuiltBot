@@ -37,6 +37,7 @@ public class Shoot extends Command {
 
       double[] conditions = m_shooterSubstystem.getIdealShooterConditions();
       double w0 = conditions[0];
+      double phi = conditions[1];
       Logger.recordOutput("Shooter/v0", w0);
 
       m_shooterSubstystem.setTargetSpeedRPM(w0);
