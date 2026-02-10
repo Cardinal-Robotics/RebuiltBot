@@ -4,9 +4,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.math.geometry.Pose2d;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
@@ -24,7 +24,7 @@ public class RobotContainer {
   // -----------------------------------------------------------------------------------
   private final SwerveSubsystem m_swerveSubsystem = new SwerveSubsystem(); // awesome
   private final ShooterSubstystem m_shooterSubsystem = new ShooterSubstystem(m_swerveSubsystem); // awesome
-  private final SimulationSubsystem m_smulationSubsystem = new SimulationSubsystem();
+  private final SimulationSubsystem m_simulationSubsystem = new SimulationSubsystem();
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveSubsystem);
   // -----------------------------------------------------------------------------------
 

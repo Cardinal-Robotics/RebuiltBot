@@ -75,10 +75,6 @@ public class SwerveSubsystem extends SubsystemBase {
     m_swerveDrive.resetOdometry(kInitialRedRobotPose);
 
     setupPathPlanner();
-
-    SmartDashboard.putData(m_swerveDrive.field);
-    SmartDashboard.putNumber("x", 0);
-    SmartDashboard.putNumber("y", 0);
   }
 
   @Override
@@ -99,10 +95,6 @@ public class SwerveSubsystem extends SubsystemBase {
     m_swerveDrive.drive(velocity);
   }
 
-/*   public void setRotation() {
-    m_swerveDrive.swerveController.thetaController
-  }
- */
   public Command driveRelative(Supplier<ChassisSpeeds> velocity) {
     return run(() -> {
       driveRelative(velocity.get()); // runs this function

@@ -87,20 +87,7 @@ public class VisionSubsystem extends SubsystemBase {
     if (results.hasTargets()) {
       List<PhotonTrackedTarget> targets = results.getTargets(); // gets all of the targets
       PhotonTrackedTarget target = results.getBestTarget(); // best target
-      // GETTING DATA FROM THE TARGETS
-      double yaw = target.getYaw();
-      double pitch = target.getPitch();
-      double area = target.getArea();
-      double skew = target.getSkew();
-      Transform3d bestCameratoTarget = target.getBestCameraToTarget();
-      Transform3d alternateCameraToTarget = target.getAlternateCameraToTarget();
-      List<TargetCorner> corners = target.getMinAreaRectCorners();
-
-      targetID = target.getFiducialId();
-      double poseAmbiguity = target.getPoseAmbiguity();
-
-    } else
-      targetID = -1;
+        }
 
     visionSim.update(m_swerveSubsystem.getPose2d());
 

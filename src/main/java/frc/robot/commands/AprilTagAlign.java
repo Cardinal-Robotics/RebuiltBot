@@ -4,12 +4,6 @@
 
 package frc.robot.commands;
 
-import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
-import com.pathplanner.lib.trajectory.PathPlannerTrajectory;
-import com.pathplanner.lib.config.PIDConstants;
-import com.pathplanner.lib.path.*;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,8 +12,6 @@ import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsytems.*;
 
 import org.littletonrobotics.junction.Logger;
-
-import java.util.List;
 
 public class AprilTagAlign extends Command {
   Timer m_timer = new Timer();

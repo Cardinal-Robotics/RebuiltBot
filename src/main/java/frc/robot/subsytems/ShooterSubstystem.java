@@ -34,7 +34,6 @@ import com.revrobotics.ResetMode;
 
 
 public class ShooterSubstystem extends SubsystemBase {
-
   private SparkMax m_shootMotor = new SparkMax(34, MotorType.kBrushless);
 
   private DCMotor m_neoGearbox = DCMotor.getNEO(1);
@@ -99,7 +98,6 @@ public class ShooterSubstystem extends SubsystemBase {
    *         Index 1 is azimuthal angle
    */
   public double[] getIdealShooterConditions() {
-
     Pose3d currentPosition = new Pose3d(m_swerveSubstystem.getPose2d());
 
     Pose3d targetPosition = new Pose3d(

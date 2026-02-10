@@ -8,6 +8,7 @@ import swervelib.simulation.ironmaple.simulation.gamepieces.GamePiece;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import edu.wpi.first.math.geometry.Pose3d;
 
 import org.littletonrobotics.junction.Logger;
@@ -18,8 +19,8 @@ import java.util.List;
 public class SimulationSubsystem extends SubsystemBase {
   SimulatedArena m_arena = SimulatedArena.getInstance();
 
-  /** Creates a new SimulationSubsystem. */
   public SimulationSubsystem() {
+    if(!Robot.isSimulation()) return;
 
     m_arena = SimulatedArena.getInstance();
     m_arena.placeGamePiecesOnField();
