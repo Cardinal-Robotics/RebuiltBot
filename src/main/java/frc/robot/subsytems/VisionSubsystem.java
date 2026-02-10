@@ -87,7 +87,7 @@ public class VisionSubsystem extends SubsystemBase {
     if (results.hasTargets()) {
       List<PhotonTrackedTarget> targets = results.getTargets(); // gets all of the targets
       PhotonTrackedTarget target = results.getBestTarget(); // best target
-        }
+    }
 
     visionSim.update(m_swerveSubsystem.getPose2d());
 

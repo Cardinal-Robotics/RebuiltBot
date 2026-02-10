@@ -26,6 +26,7 @@ public class RobotContainer {
   private final ShooterSubstystem m_shooterSubsystem = new ShooterSubstystem(m_swerveSubsystem); // awesome
   private final SimulationSubsystem m_simulationSubsystem = new SimulationSubsystem();
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveSubsystem);
+  private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(m_swerveSubsystem);
   // -----------------------------------------------------------------------------------
 
   private final CommandXboxController m_driverController = new CommandXboxController(
@@ -101,6 +102,8 @@ public class RobotContainer {
     m_driverController.y().toggleOnTrue(driveAutoAlign);
     m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button
     m_driverController.rightTrigger().toggleOnTrue(shootyBoi);
+    m_driverController.povUp().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));
+    m_driverController.povDown().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
 
     /*
      * m_driverController.x().onTrue(Commands.runOnce(() -> {
