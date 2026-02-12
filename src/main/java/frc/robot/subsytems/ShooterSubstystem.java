@@ -32,9 +32,10 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 
-
 public class ShooterSubstystem extends SubsystemBase {
   private SparkMax m_shootMotor = new SparkMax(34, MotorType.kBrushless);
+
+  private SparkMax m_uptakeMotor = new SparkMax(3482948, MotorType.kBrushless);
 
   private DCMotor m_neoGearbox = DCMotor.getNEO(1);
 
@@ -49,21 +50,29 @@ public class ShooterSubstystem extends SubsystemBase {
 
   private FlywheelSim m_flywheelSim = new FlywheelSim(m_linearSystemProfile, m_neoGearbox);
 
-  /** Creates a new ShooterSubstystem. */
   public ShooterSubstystem(SwerveSubsystem swerveSubsystem) {
-    
-    
+
     SparkMaxConfig shootConfig = new SparkMaxConfig();
 
     shootConfig.idleMode(IdleMode.kBrake);
     shootConfig.closedLoop.pid(0.0005, 0.001, 0);
+
+    SparkMaxConfig uptakeConfig = new SparkMaxConfig();
+    uptakeConfig.idleMode(IdleMode.kBrake);
+    uptakeConfig.closedLoop.pid(0.0005, 0.001, 0);
 
     m_shootMotor.configure(
         shootConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
+    m_uptakeMotor.configure(
+        uptakeConfig,
+        ResetMode.kResetSafeParameters,
+        PersistMode.kPersistParameters);
+
     m_shootMotor.getEncoder();
+    m_uptakeMotor.getEncoder();
 
     m_swerveSubstystem = swerveSubsystem;
 
