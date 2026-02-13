@@ -13,10 +13,9 @@ import com.pathplanner.lib.commands.PathPlannerAuto;
 import org.littletonrobotics.junction.Logger;
 
 import swervelib.SwerveInputStream;
-
-import frc.robot.subsytems.*;
 import frc.robot.Constants.*;
 import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 
 public class RobotContainer {
 
@@ -27,6 +26,7 @@ public class RobotContainer {
   private final SimulationSubsystem m_simulationSubsystem = new SimulationSubsystem();
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveSubsystem);
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(m_swerveSubsystem);
+  private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
   // -----------------------------------------------------------------------------------
 
   private final CommandXboxController m_driverController = new CommandXboxController(
@@ -86,6 +86,9 @@ public class RobotContainer {
   Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_visionSubsystem);
   Command shootyBoi = new Shoot(m_shooterSubsystem, m_swerveSubsystem);
 
+  Command riseCommand = m_climberSubsystem.riseCommand();
+  Command descendCommand = m_climberSubsystem.descendCommand();
+
   // -----------------------------------------------------------------------------------
 
   private void configureBindings() {
@@ -102,8 +105,10 @@ public class RobotContainer {
     m_driverController.y().toggleOnTrue(driveAutoAlign);
     m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button
     m_driverController.rightTrigger().toggleOnTrue(shootyBoi);
-    m_driverController.povUp().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));
-    m_driverController.povDown().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
+    m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));
+    m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
+    m_driverController.povUp().whileTrue(descendCommand);
+    m_driverController.povDown().whileTrue(riseCommand);
 
     /*
      * m_driverController.x().onTrue(Commands.runOnce(() -> {

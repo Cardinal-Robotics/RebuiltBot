@@ -1,6 +1,6 @@
 // Copyright Charlie Malerich all code is completely original and is not legally sueable} nerds?
 
-package frc.robot.subsytems;
+package frc.robot.subsystems;
 
 
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -28,8 +28,8 @@ import edu.wpi.first.apriltag.*;
 
 import org.littletonrobotics.junction.Logger;
 
-import frc.robot.subsytems.SwerveSubsystem;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.SwerveSubsystem;
 
 import java.util.function.Supplier;
 import java.io.IOException;

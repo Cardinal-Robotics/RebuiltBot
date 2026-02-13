@@ -16,8 +16,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 import org.littletonrobotics.junction.Logger;
 
-import frc.robot.subsytems.*;
 import frc.robot.Robot;
+import frc.robot.subsystems.*;
 
 public class Shoot extends Command {
   private ShooterSubstystem m_shooterSubstystem;
