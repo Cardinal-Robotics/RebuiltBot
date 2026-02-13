@@ -18,23 +18,32 @@ import org.photonvision.targeting.PhotonPipelineResult;
 import java.util.Optional;
 
 public class VisionSubsystem extends SubsystemBase {
-  private final Camera leftCamera, rightCamera;
+  private final AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(
+      AprilTagFields.k2026RebuiltWelded);
 
-  private SwerveSubsystem m_swerveSubsystem;
-  private VisionSystemSim visionSim;
+  private final SwerveSubsystem m_swerveSubsystem;
+  private final Camera leftCamera, rightCamera;
+  private final VisionSystemSim visionSim;
 
   public VisionSubsystem(SwerveSubsystem swerveSubsystem) {
     this.m_swerveSubsystem = swerveSubsystem;
 
-    leftCamera = new Camera("leftCamera", new Transform3d(
-        new Translation3d(),
-        new Rotation3d()),
+    this.visionSim = new VisionSystemSim("main");
+    this.visionSim.addAprilTags(tagLayout);
+
+    leftCamera = new Camera("leftCamera",
+        this.visionSim,
+        new Transform3d(
+            new Translation3d(),
+            new Rotation3d()),
         VecBuilder.fill(4, 4, 8),
         VecBuilder.fill(0.5, 0.5, 1));
 
-    rightCamera = new Camera("rightCamera", new Transform3d(
-        new Translation3d(),
-        new Rotation3d()),
+    rightCamera = new Camera("rightCamera",
+        this.visionSim,
+        new Transform3d(
+            new Translation3d(),
+            new Rotation3d()),
         VecBuilder.fill(4, 4, 8),
         VecBuilder.fill(0.5, 0.5, 1));
   }
@@ -67,17 +76,23 @@ public class VisionSubsystem extends SubsystemBase {
   public Optional<PhotonPipelineResult> getBestResult() {
     Optional<PhotonPipelineResult> leftCameraBest = this.leftCamera.getBestResult();
     Optional<PhotonPipelineResult> rightCameraBest = this.rightCamera.getBestResult();
-    Optional<PhotonPipelineResult> bestResult;
 
-    // If one is empty, return the other. If both are empty, return Optional.empty();  
-    if(leftCameraBest.isPresent() && rightCameraBest.isEmpty()) return bestResult = leftCameraBest;
-    else if(rightCameraBest.isPresent() && leftCameraBest.isEmpty()) return bestResult = rightCameraBest;
-    else if(leftCameraBest.isEmpty() && rightCameraBest.isEmpty()) return bestResult = Optional.empty();
+    // If one is empty, return the other. If both are empty, return
+    // Optional.empty();
+    if (leftCameraBest.isPresent() && rightCameraBest.isEmpty())
+      return leftCameraBest;
+    else if (rightCameraBest.isPresent() && leftCameraBest.isEmpty())
+      return rightCameraBest;
+    else if (leftCameraBest.isEmpty() && rightCameraBest.isEmpty())
+      return Optional.empty();
 
+    // If both are present, return the one with the least ambiguity.
     double leftBestAmbiguity = leftCameraBest.get().getBestTarget().poseAmbiguity;
     double rightBestAmbiguity = rightCameraBest.get().getBestTarget().poseAmbiguity;
 
-    if(leftBestAmbiguity > rightBestAmbiguity) return rightCameraBest;
-    else return leftCameraBest;
+    if (leftBestAmbiguity > rightBestAmbiguity)
+      return rightCameraBest;
+    else
+      return leftCameraBest;
   }
 }

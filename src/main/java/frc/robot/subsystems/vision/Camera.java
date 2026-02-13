@@ -32,27 +32,27 @@ import frc.robot.Robot;
 
 // Our own wrapper class that can hold a PhotonCamera and all the other things we need to track with it for convinience.
 public class Camera {
-    private final AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(
+        private final AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(
             AprilTagFields.k2026RebuiltWelded);
-
     private final PhotonPoseEstimator poseEstimator;
     private final Transform3d robotToCameraOffset;
     private final PhotonCamera photonCamera;
+    private final VisionSystemSim visionSim;
 
     private Optional<EstimatedRobotPose> estimatedRobotPose = Optional.empty();
     private List<PhotonPipelineResult> resultsList = new ArrayList<>();
     private PhotonCameraSim cameraSimulation;
-    private VisionSystemSim visionSim;
 
     // Standard deviation settings for recognizing AprilTags?
     private final Matrix<N3, N1> singleTagStdDevs;
     private final Matrix<N3, N1> multiTagStdDevs;
     public Matrix<N3, N1> curStdDevs;
 
-    public Camera(String cameraName, Transform3d robotToCamera, Matrix<N3, N1> singleTagStdDevs,
+    public Camera(String cameraName, VisionSystemSim visionSim, Transform3d robotToCamera, Matrix<N3, N1> singleTagStdDevs,
             Matrix<N3, N1> multiTagStdDevsMatrix) {
         this.photonCamera = new PhotonCamera(cameraName);
         this.robotToCameraOffset = robotToCamera;
+        this.visionSim = visionSim;
 
         this.singleTagStdDevs = singleTagStdDevs;
         this.multiTagStdDevs = multiTagStdDevsMatrix;
@@ -66,9 +66,6 @@ public class Camera {
     }
 
     public void createSimulation() {
-        this.visionSim = new VisionSystemSim("main");
-        this.visionSim.addAprilTags(tagLayout);
-
         SimCameraProperties cameraProperties = new SimCameraProperties();
         cameraProperties.setCalibration(960, 720, Rotation2d.fromDegrees(100));
         cameraProperties.setCalibError(0.25, 0.08);
@@ -86,15 +83,16 @@ public class Camera {
 
     /* ------ GETTERS LOGIC ------ */
     public Optional<EstimatedRobotPose> getEstimatedPose() {
-        return Optional.empty();
+        return this.estimatedRobotPose;
     }
 
     public Optional<PhotonPipelineResult> getBestResult() {
-        if (resultsList.isEmpty()) return Optional.empty();
+        if (resultsList.isEmpty())
+            return Optional.empty();
 
         PhotonPipelineResult bestResult = resultsList.get(0);
         double amiguity = bestResult.getBestTarget().getPoseAmbiguity();
-        
+
         for (PhotonPipelineResult result : resultsList) {
             double currentAmbiguity = result.getBestTarget().getPoseAmbiguity();
             if (currentAmbiguity < amiguity && currentAmbiguity > 0) {
@@ -106,7 +104,8 @@ public class Camera {
     }
 
     public Optional<PhotonPipelineResult> getLatestResult() {
-        if(resultsList.isEmpty()) return Optional.empty();
+        if (resultsList.isEmpty())
+            return Optional.empty();
         return Optional.of(resultsList.get(0));
     }
 

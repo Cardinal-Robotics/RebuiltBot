@@ -13,11 +13,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimberSubsystem extends SubsystemBase {
   private TalonSRX m_climberMotorLeft = new TalonSRX(149);
-  private TalonSRX m_climberMotorRight = new TalonSRX(2594);
+  private TalonSRX m_climberMotorRight = new TalonSRX(259);
   private DigitalInput m_bottomLimitSwitchLeft = new DigitalInput(0);
   private DigitalInput m_topLimitSwitchLeft = new DigitalInput(1);
   private DigitalInput m_bottomLimitSwitchRight = new DigitalInput(2);
-  private DigitalInput m_topLimitSwitchRight = new DigitalInput(90);
+  private DigitalInput m_topLimitSwitchRight = new DigitalInput(3);
   
 
 

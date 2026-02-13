@@ -5,6 +5,7 @@ package frc.robot.subsystems;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.parser.SwerveParser;
+import swervelib.simulation.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 import swervelib.SwerveDrive;
 
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -80,14 +81,11 @@ public class SwerveSubsystem extends SubsystemBase {
   @Override
   public void periodic() { // Luke Vu is the most Luke Vu guy I know (except for Luke Vu et al.)
     // This method will be called once per scheduler run
-    Pose2d pose = m_swerveDrive.getPose();
-    Logger.recordOutput("YAGSL", pose);
+    Logger.recordOutput("YAGSL", m_swerveDrive.getPose());
   }
 
   @Override
   public void simulationPeriodic() {
-    Pose2d simulationPose = m_swerveDrive.getSimulationDriveTrainPose().orElseGet(() -> Pose2d.kZero);
-    m_swerveDrive.swerveDrivePoseEstimator.resetPose(simulationPose);
   }
 
   public void driveRelative(ChassisSpeeds velocity) { // driving relative to the robot
