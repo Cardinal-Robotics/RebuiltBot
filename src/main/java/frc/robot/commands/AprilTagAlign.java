@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.Timer;
 
@@ -31,9 +32,11 @@ public class AprilTagAlign extends Command {
   public void initialize() {
     m_timer.reset();
     m_timer.start();
-    targetID = m_visionSubsystem.getBestTargetId();
-    if (targetID == -1)
+    var apriltagTarget = m_visionSubsystem.getBestResult();
+    if (apriltagTarget.isEmpty())
       m_finished = true;
+
+    targetID = apriltagTarget.get().targets.get(0).fiducialId;
   }
 
   // Called every time the scheduler runs while the command is scheduled.

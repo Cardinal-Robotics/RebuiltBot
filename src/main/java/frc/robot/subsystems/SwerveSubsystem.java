@@ -2,7 +2,6 @@
 
 package frc.robot.subsystems;
 
-
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.parser.SwerveParser;
@@ -20,13 +19,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.apriltag.*;
 
 import org.littletonrobotics.junction.Logger;
+import org.photonvision.EstimatedRobotPose;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -38,9 +41,8 @@ import java.util.List;
 import java.io.File;
 
 public class SwerveSubsystem extends SubsystemBase {
-  public int driveType;
   private SwerveDrive m_swerveDrive; // create variable so the whole class can see it
-  
+
   public RobotConfig config;
 
   Optional<Pose3d> tag0 = fieldLayout.getTagPose(1);
@@ -49,8 +51,6 @@ public class SwerveSubsystem extends SubsystemBase {
       AprilTagFields.k2026RebuiltWelded);
 
   public SwerveSubsystem() {
-    driveType = 0;
-
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH; // quoth Lil Vu: "tells YAGSL to print a bunch of stuff"
 
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve"); // goes to filesystem, finds deploy
@@ -114,7 +114,7 @@ public class SwerveSubsystem extends SubsystemBase {
   }
 
   /**
-   * @param seconds - the time along the path
+   * @param seconds    - the time along the path
    * @param targetPose - the target position
    * @returns {@link ChassisSpeeds} - Robot relative driving speeds.
    */
@@ -145,18 +145,18 @@ public class SwerveSubsystem extends SubsystemBase {
         path,
         startingSpeeds,
         startingRotation,
-        config
-    );
+        config);
 
     PathPlannerTrajectoryState trajectoryState = trajectory.sample(seconds);
 
-    ChassisSpeeds speeds = DriveConstants.kPathDriveController.calculateRobotRelativeSpeeds(getPose2d(), trajectoryState);
+    ChassisSpeeds speeds = DriveConstants.kPathDriveController.calculateRobotRelativeSpeeds(getPose2d(),
+        trajectoryState);
     return speeds;
   }
 
-  public void toggleDriveType() { // there you are hahahah
-    driveType = (driveType == 0) ? 1 : 0;
-    System.out.println("Drive type toggled to " + (driveType == 0 ? "FIELD" : "RELATIVE"));
+  public void addVisionMeasurement(EstimatedRobotPose estimatedRobotPose, Matrix<N3, N1> standardDeviations) {
+    m_swerveDrive.addVisionMeasurement(estimatedRobotPose.estimatedPose.toPose2d(),
+        estimatedRobotPose.timestampSeconds, standardDeviations);
   }
 
   public SwerveDrive getSwerveDrive() {
