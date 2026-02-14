@@ -46,11 +46,6 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public RobotConfig config;
 
-  Optional<Pose3d> tag0 = fieldLayout.getTagPose(1);
-
-  public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(
-      AprilTagFields.k2026RebuiltWelded);
-
   public SwerveSubsystem() {
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH; // quoth Lil Vu: "tells YAGSL to print a bunch of stuff"
 
@@ -72,7 +67,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     Pose2d kInitialRedRobotPose = new Pose2d(12.95, 0.6, Rotation2d.kZero);
 
-    m_swerveDrive.field.setRobotPose(kInitialRedRobotPose);
+    SmartDashboard.putData("Field", m_swerveDrive.field);
     m_swerveDrive.resetOdometry(kInitialRedRobotPose);
 
     setupPathPlanner();
@@ -82,6 +77,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public void periodic() { // Luke Vu is the most Luke Vu guy I know (except for Luke Vu et al.)
     // This method will be called once per scheduler run
     Logger.recordOutput("YAGSL", m_swerveDrive.getPose());
+    m_swerveDrive.updateOdometry();
   }
 
   @Override

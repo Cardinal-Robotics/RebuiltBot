@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -51,7 +52,6 @@ public class ShooterSubstystem extends SubsystemBase {
   private FlywheelSim m_flywheelSim = new FlywheelSim(m_linearSystemProfile, m_neoGearbox);
 
   public ShooterSubstystem(SwerveSubsystem swerveSubsystem) {
-
     SparkMaxConfig shootConfig = new SparkMaxConfig();
 
     shootConfig.idleMode(IdleMode.kBrake);
@@ -147,18 +147,13 @@ public class ShooterSubstystem extends SubsystemBase {
           "Target unreachable at 65 degrees");
     }
 
-    // Initial velocity
-    double v0Squared = (g * horizontalDistance * horizontalDistance) / denom;
-
-    double w0 = Math.sqrt(v0Squared);
-
-    // Azimuth angle (turret yaw)
-    double phi = Math.atan2(dy, dx);
+    UnivariateFunction f = t -> {
+      double rx = dx
+    };
 
     // Flywheel RPM conversion (2 inch radius wheel)
     double wheelRadiusMeters = Meters.convertFrom(2, Inches);
-
-    double rotationalVelocityRPM = w0 / (2 * Math.PI * wheelRadiusMeters) * 60.0;
+    double rotationalVelocityRPM = v0 / (2 * Math.PI * wheelRadiusMeters) * 60.0;
 
     return new double[] { rotationalVelocityRPM, phi };
   }
@@ -169,7 +164,6 @@ public class ShooterSubstystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-
     double timestep = 20e-3;
 
     m_flywheelSim.setInputVoltage(

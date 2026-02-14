@@ -29,6 +29,7 @@ public class SimulationSubsystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
+    m_arena.simulationPeriodic();
     List<GamePiece> fuelGamePieces = SimulatedArena.getInstance().getGamePiecesByType("Fuel");
 
     List<Pose3d> poses = new ArrayList<>();

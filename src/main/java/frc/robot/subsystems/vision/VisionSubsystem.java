@@ -8,12 +8,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.apriltag.*;
-
+import frc.robot.Robot;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.simulation.*;
 import org.photonvision.targeting.PhotonPipelineResult;
+
+import static edu.wpi.first.units.Units.Meters;
 
 import java.util.Optional;
 
@@ -34,7 +36,11 @@ public class VisionSubsystem extends SubsystemBase {
     leftCamera = new Camera("leftCamera",
         this.visionSim,
         new Transform3d(
-            new Translation3d(),
+            new Translation3d(
+              Meters.fromBaseUnits(0.29613),
+              Meters.fromBaseUnits(0.22033),
+              Meters.fromBaseUnits(0.15914)
+            ),
             new Rotation3d()),
         VecBuilder.fill(4, 4, 8),
         VecBuilder.fill(0.5, 0.5, 1));
@@ -42,7 +48,11 @@ public class VisionSubsystem extends SubsystemBase {
     rightCamera = new Camera("rightCamera",
         this.visionSim,
         new Transform3d(
-            new Translation3d(),
+            new Translation3d(
+              Meters.fromBaseUnits(0.29613),
+              Meters.fromBaseUnits(-0.22033),
+              Meters.fromBaseUnits(0.15914)
+            ),
             new Rotation3d()),
         VecBuilder.fill(4, 4, 8),
         VecBuilder.fill(0.5, 0.5, 1));
@@ -50,8 +60,8 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    visionSim.update(m_swerveSubsystem.getPose2d());
-    visionSim.getDebugField();
+    if(Robot.isSimulation())
+    visionSim.update(m_swerveSubsystem.getSwerveDrive().getSimulationDriveTrainPose().get());
 
     // Processes the latest vision data and updates the camera's pose estimation.
     this.leftCamera.update();
