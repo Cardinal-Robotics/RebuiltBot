@@ -105,7 +105,7 @@ public class RobotContainer {
 
     m_driverController.y().toggleOnTrue(driveAutoAlign);
     m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button
-    m_driverController.rightTrigger().toggleOnTrue(shootyBoi);
+    m_driverController.rightTrigger().whileTrue(shootyBoi);
     m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));
     m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
     m_driverController.povUp().whileTrue(descendCommand);

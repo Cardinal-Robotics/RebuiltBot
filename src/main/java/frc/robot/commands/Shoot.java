@@ -32,12 +32,20 @@ public class Shoot extends Command {
 
   @Override
   public void initialize() {
-    if (Robot.isSimulation()) { // "units are a man's worst enemy" - Charlie Malerich 1/26/2026
+
+  }
+
+  @Override
+  public void execute() {
+        if (Robot.isSimulation()) { // "units are a man's worst enemy" - Charlie Malerich 1/26/2026
       double theta = Math.toRadians(65); // FIXED SHOOTER ANGLE
 
       double[] conditions = m_shooterSubstystem.getIdealShooterConditions();
       double w0 = conditions[0];
       double phi = conditions[1];
+
+      if(Double.isNaN(w0) || Double.isNaN(phi)) return;
+
       Logger.recordOutput("Shooter/v0", w0);
 
       m_shooterSubstystem.setTargetSpeedRPM(w0);
@@ -47,7 +55,7 @@ public class Shoot extends Command {
           m_swerveSubstystem.getPose2d().getTranslation(),
           new Translation2d(0.2, 0),
           m_swerveSubstystem.getFieldVelocity(),
-          m_swerveSubstystem.getPose2d().getRotation(),
+          new Rotation2d(phi),
           Distance.ofBaseUnits(0.45, Meters),
           LinearVelocity.ofBaseUnits(m_shooterSubstystem.getVelocityRPM() * (2 * Math.PI * Meters.convertFrom(2, Inches)) / 60, MetersPerSecond), // V sub 0 = sqrt(x^2/(2s)^2 + (72 in +
                                                            // ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
@@ -67,10 +75,6 @@ public class Shoot extends Command {
 
       SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
     }
-  }
-
-  @Override
-  public void execute() {
   }
 
   // Called once the command ends or is interrupted.

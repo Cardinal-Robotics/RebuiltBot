@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.solvers.BrentSolver;
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -90,6 +91,8 @@ public class ShooterSubstystem extends SubsystemBase {
     double theta = Math.toRadians(65); // FIXED SHOOTER ANGLE
 
     double[] values = getIdealShooterConditions();
+    if(Double.isNaN(values[0])) return;
+
     setTargetSpeedRPM(values[0]);
 
     Logger.recordOutput(
@@ -127,29 +130,40 @@ public class ShooterSubstystem extends SubsystemBase {
 
     final double g = 9.8;
     final double theta = Math.toRadians(65.0);
+    final double t_min = 0.5;
+    final double t_max = 3.5;
 
     double dx = targetPosition.getX() - currentPosition.getX();
-
     double dy = targetPosition.getY() - currentPosition.getY();
-
-    double horizontalDistance = Math.hypot(dx, dy);
-
     double dz = targetPosition.getZ() - currentPosition.getZ();
+    double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond;
+    double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond;
 
-    double cos = Math.cos(theta);
-    double tan = Math.tan(theta);
+    // Solves for t = 0 using some special technique called the BrentSolver.
+    UnivariateFunction f = t -> {
+      double rx = dx - (v_robotX * t);
+      double ry = dy - (v_robotY * t);
+      double r = Math.hypot(rx, ry);
+      return Math.tan(theta) * r - (0.5 * g * t * t) - dz;
+    };
 
-    double denom = 2 * cos * cos * (horizontalDistance * tan - dz);
+    BrentSolver functionSolver = new BrentSolver(1e-6);
+    double t = 0;
 
-    if (denom <= 0) {
-      Logger.recordOutput(
-          "Shooter/Error",
-          "Target unreachable at 65 degrees");
+    // If there are no valid solutions, it throws an error
+    try {
+      t = functionSolver.solve(100, f, t_min, t_max);
+    } catch (Exception e) {
+      return new double[] {Double.NaN, Double.NaN};
     }
 
-    UnivariateFunction f = t -> {
-      double rx = dx
-    };
+    // Given t, now solve for v0 and phi.
+    double rx = dx - (v_robotX * t);
+    double ry = dy - (v_robotY * t);
+    double r = Math.hypot(rx, ry);
+
+    double v0 = r / (t * Math.cos(theta));
+    double phi = Math.atan2(ry, rx);
 
     // Flywheel RPM conversion (2 inch radius wheel)
     double wheelRadiusMeters = Meters.convertFrom(2, Inches);
@@ -157,6 +171,7 @@ public class ShooterSubstystem extends SubsystemBase {
 
     return new double[] { rotationalVelocityRPM, phi };
   }
+
 
   // TODO: WILL NEVER DO as prophesized by the Great Vu Postulate
   public void createSimulatedFuelProjectile() {
