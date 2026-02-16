@@ -139,12 +139,15 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void simulationPeriodic() {
-
     m_intakeArmSim.setInput(m_pivotMotorSim.getAppliedOutput() * RobotController.getBatteryVoltage());
     m_pivotMotorSim.iterate(m_intakeArmSim.getVelocityRadPerSec(), RoboRioSim.getVInVoltage(), 0.020);
     m_intakeArmSim.update(0.020);
 
     m_pivotMotorSim.setPosition(Units.radiansToDegrees(m_intakeArmSim.getAngleRads()));
+
+    if(m_pivotMotor.getClosedLoopController().getSetpoint() == 0 && m_intakeMotor.getMotorOutputPercent() > 0) {
+      m_intakeSimulation.startIntake();
+    } else m_intakeSimulation.stopIntake();
 
     RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_intakeArmSim.getCurrentDrawAmps()));
@@ -160,4 +163,19 @@ public class IntakeSubsystem extends SubsystemBase {
     return runEnd(() -> setIntakePivot(angle), pidController::isAtSetpoint);
   }
 
+  public Command runIntakeMotor(double speed) {
+    return run(() -> setIntakeSpeed(speed));
+  }
+
+  public void stopIntakeMotor() {
+    setIntakeSpeed(0);
+  }
+
+  public Command stopIntakeCommand() {
+    return run(() -> stopIntakeMotor());
+  }
+
+  public boolean obtainGamePieceFromIntake() {
+    return m_intakeSimulation.obtainGamePieceFromIntake();
+  }
 }

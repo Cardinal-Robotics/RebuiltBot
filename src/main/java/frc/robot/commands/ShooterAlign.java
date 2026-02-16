@@ -13,6 +13,7 @@ import com.pathplanner.lib.path.*;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.ShooterSubstystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -27,15 +28,15 @@ import java.util.List;
 public class ShooterAlign extends Command {
   Timer m_timer = new Timer();
   SwerveSubsystem m_swerveSubsystem;
-  VisionSubsystem m_visionSubsystem;
+  ShooterSubstystem m_shooterSubsytem;
   private int targetID = -1;
   boolean m_finished = false;
 
-  public ShooterAlign(SwerveSubsystem swerveSubsystem, VisionSubsystem visionSubsystem) {
+  public ShooterAlign(SwerveSubsystem swerveSubsystem, ShooterSubstystem shooterSubsytem) {
     addRequirements(swerveSubsystem);
 
     m_swerveSubsystem = swerveSubsystem;
-    m_visionSubsystem = visionSubsystem;
+    m_shooterSubsytem = shooterSubsytem;
   }
 
   @Override

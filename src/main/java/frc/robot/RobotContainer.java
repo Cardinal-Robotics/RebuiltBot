@@ -28,6 +28,7 @@ public class RobotContainer {
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveSubsystem);
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(m_swerveSubsystem);
   private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
+  private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
   // -----------------------------------------------------------------------------------
 
   private final CommandXboxController m_driverController = new CommandXboxController(
@@ -80,15 +81,17 @@ public class RobotContainer {
   SwerveInputStream driveAimBlueHub = driveDirectAngle.copy().aim(new Pose2d(4.5, 4.03, Rotation2d.kZero)).aimWhile(true);
 
   Command driveFieldOrientedRedHub = m_swerveSubsystem.driveFieldOriented(driveAimRedHub);
-
   Command driveFieldOrientedBlueHub = m_swerveSubsystem.driveFieldOriented(driveAimBlueHub);
 
   Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
-  Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_visionSubsystem);
-  Command shootyBoi = new Shoot(m_shooterSubsystem, m_swerveSubsystem);
+  Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_shooterSubsystem);
+  Command shootyBoi = new Shoot(m_shooterSubsystem, m_swerveSubsystem, m_intakeSubsystem);
 
   Command riseCommand = m_climberSubsystem.riseCommand();
   Command descendCommand = m_climberSubsystem.descendCommand();
+  Command indexerCommand = m_indexerSubsystem.spinIndexerCommand();
+  Command intakeCommand = m_intakeSubsystem.runIntakeMotor(.5);
+  Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
 
   // -----------------------------------------------------------------------------------
 
@@ -104,12 +107,14 @@ public class RobotContainer {
     m_driverController.x().toggleOnTrue(driveRobotOrientedHubLocked);
 
     m_driverController.y().toggleOnTrue(driveAutoAlign);
-    m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button
-    m_driverController.rightTrigger().whileTrue(shootyBoi);
+    m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button - great vu postulate
+    m_driverController.rightTrigger().whileTrue(shootyBoi).whileTrue(indexerCommand);
     m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));
     m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
     m_driverController.povUp().whileTrue(descendCommand);
     m_driverController.povDown().whileTrue(riseCommand);
+    m_driverController.leftTrigger().whileTrue(intakeCommand).whileTrue(indexerCommand);
+    m_driverController.leftTrigger().whileFalse(stopIntakeCommand);
 
     /*
      * m_driverController.x().onTrue(Commands.runOnce(() -> {
@@ -129,6 +134,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("Lucas' Auto");
+    return new PathPlannerAuto("PEAK");
   }
 }
