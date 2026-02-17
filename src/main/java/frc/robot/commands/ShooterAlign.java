@@ -54,6 +54,8 @@ public class ShooterAlign extends Command {
 
     ChassisSpeeds speeds = m_swerveSubsystem.calculateAlignSpeeds(m_timer.get(), targetPose);
     m_swerveSubsystem.driveRelative(speeds);
+
+    if(m_swerveSubsystem.getPose2d().getTranslation().getDistance(targetPose.getTranslation()) < .05) m_finished = true;
   }
 
   public Pose2d getShootPose() {
@@ -108,6 +110,6 @@ public class ShooterAlign extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return m_finished;
   }
 }

@@ -112,6 +112,8 @@ public class IntakeSubsystem extends SubsystemBase {
         Meters.of(0.183),
         IntakeSide.BACK,
         100);
+
+      this.m_intakeSimulation.addGamePiecesToIntake(80);
   }
 
   public void setTargetAngle(double angle) {
@@ -160,11 +162,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public Command setIntakePivotCommand(double angle) {
     SparkClosedLoopController pidController = m_pivotMotor.getClosedLoopController();
-    return runEnd(() -> setIntakePivot(angle), pidController::isAtSetpoint);
+    return runOnce(() -> setIntakePivot(angle)/*  , pidController::isAtSetpoint */);
   }
 
   public Command runIntakeMotor(double speed) {
-    return run(() -> setIntakeSpeed(speed));
+    return runOnce(() -> setIntakeSpeed(speed));
   }
 
   public void stopIntakeMotor() {
@@ -172,10 +174,11 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public Command stopIntakeCommand() {
-    return run(() -> stopIntakeMotor());
+    return runOnce(() -> stopIntakeMotor());
   }
 
   public boolean obtainGamePieceFromIntake() {
     return m_intakeSimulation.obtainGamePieceFromIntake();
   }
+  
 }

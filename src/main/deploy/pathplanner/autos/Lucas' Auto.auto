@@ -9,6 +9,18 @@
           "data": {
             "pathName": "Lukie's Auto"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Align"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
         }
       ]
     }
