@@ -4,8 +4,11 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Radians;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.solvers.BrentSolver;
@@ -13,7 +16,13 @@ import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.system.plant.LinearSystemId;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import swervelib.simulation.ironmaple.simulation.SimulatedArena;
+import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
+import swervelib.simulation.ironmaple.utils.FieldMirroringUtils;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -31,6 +40,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkMax;
+import com.pathplanner.lib.util.FlippingUtil;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 
@@ -51,6 +61,11 @@ public class ShooterSubstystem extends SubsystemBase {
       1);
 
   private FlywheelSim m_flywheelSim = new FlywheelSim(m_linearSystemProfile, m_neoGearbox);
+
+  private final double theta = Math.toRadians(65);
+  private final double wheelRadiusMeters = Meters.convertFrom(2, Inches);
+  private final double flywheelConversionFactor = (2 * Math.PI * wheelRadiusMeters) / 60.0;
+  private final Transform3d shooterOffset = new Transform3d(0, 0, 0.45, Rotation3d.kZero);
 
   public ShooterSubstystem(SwerveSubsystem swerveSubsystem) {
     SparkMaxConfig shootConfig = new SparkMaxConfig();
@@ -88,7 +103,6 @@ public class ShooterSubstystem extends SubsystemBase {
     }
 
     // This method will be called once per scheduler run
-    double theta = Math.toRadians(65); // FIXED SHOOTER ANGLE
 
     double[] values = getIdealShooterConditions();
     if (Double.isNaN(values[0]))
@@ -105,47 +119,50 @@ public class ShooterSubstystem extends SubsystemBase {
         m_flywheelSim.getAngularVelocityRPM());
   }
 
+  private Pose3d getTargetPosition() {
+    Pose3d targetPosition = new Pose3d(
+        4.5,
+        4.03,
+        Meters.convertFrom(72 + 5, Inches),
+        Rotation3d.kZero);
+    if (FieldMirroringUtils.isSidePresentedAsRed())
+      targetPosition = FieldMirroringUtils.flip(targetPosition);
+
+    return targetPosition;
+  }
+
+  private double[] calculateNetTargetTranslation() {
+    Pose3d targetPosition = getTargetPosition();
+
+    final Pose3d currentPosition = new Pose3d(m_swerveSubstystem.getPose2d());
+    final Pose3d shooterPosition = currentPosition.plus(shooterOffset);
+
+    double dx = targetPosition.getX() - shooterPosition.getX();
+    double dy = targetPosition.getY() - shooterPosition.getY();
+    double dz = targetPosition.getZ() - shooterPosition.getZ();
+    return new double[] { dx, dy, dz };
+  }
+
   /**
    * @return double[]
    *         Index 0 is Rotational RPM
    *         Index 1 is azimuthal angle
    */
   public double[] getIdealShooterConditions() {
-    Pose3d currentPosition = new Pose3d(m_swerveSubstystem.getPose2d());
-
-    Pose3d targetPosition = new Pose3d(
-        4.5,
-        4.03,
-        Meters.convertFrom(72, Inches),
-        Rotation3d.kZero);
-
-    Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Red);
-
-    if (alliance == Alliance.Red) {
-      targetPosition = new Pose3d(
-          12.1,
-          4.03,
-          Meters.convertFrom(72, Inches),
-          Rotation3d.kZero);
-    }
 
     final double g = 9.8;
-    final double theta = Math.toRadians(65.0);
+    final double theta = this.theta;
     final double t_min = 0.5;
     final double t_max = 3.5;
-    final double shooterOffsetX = 0;
-    final double shooterOffsetY = 0;
-    final double shooterOffsetZ = 0;
 
+    double[] netTranslation = calculateNetTargetTranslation();
 
-    double dx = targetPosition.getX() - currentPosition.getX();
-    double dy = targetPosition.getY() - currentPosition.getY();
-    double dz = targetPosition.getZ() - currentPosition.getZ();
+    double dx = netTranslation[0], dy = netTranslation[1], dz = netTranslation[2];
     double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond;
     double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond;
     double w_robot = m_swerveSubstystem.getFieldVelocity().omegaRadiansPerSecond;
-    double v_rotX = -w_robot * shooterOffsetY;
-    double v_rotY = w_robot * shooterOffsetX;
+    double v_rotX = -w_robot * shooterOffset.getY();
+    double v_rotY = w_robot * shooterOffset.getX();
 
     // Solves for t = 0 using some special technique called the BrentSolver.
     UnivariateFunction f = t -> {
@@ -166,22 +183,99 @@ public class ShooterSubstystem extends SubsystemBase {
     }
 
     // Given t, now solve for v0 and phi.
-    double rx = dx - (v_robotX * t);
-    double ry = dy - (v_robotY * t);
+    double rx = dx - (v_robotX * t) - (v_rotX * t);
+    double ry = dy - (v_robotY * t) - (v_rotY * t);
     double r = Math.hypot(rx, ry);
 
     double v0 = r / (t * Math.cos(theta));
     double phi = Math.atan2(ry, rx);
 
     // Flywheel RPM conversion (2 inch radius wheel)
-    double wheelRadiusMeters = Meters.convertFrom(2, Inches);
-    double rotationalVelocityRPM = v0 / (2 * Math.PI * wheelRadiusMeters) * 60.0;
+    double rotationalVelocityRPM = v0 / flywheelConversionFactor;
 
     return new double[] { rotationalVelocityRPM, phi };
   }
 
   // TODO: WILL NEVER DO as prophesized by the Great Vu Postulate
+  // ERM ACTUALLY
   public void createSimulatedFuelProjectile() {
+    double v0 = getVelocityRPM() * flywheelConversionFactor;
+    RebuiltFuelOnFly fuelOnFly = new RebuiltFuelOnFly(
+        m_swerveSubstystem.getPose2d().getTranslation(),
+        new Translation2d(0, 0),
+        m_swerveSubstystem.getFieldVelocity(),
+        m_swerveSubstystem.getPose2d().getRotation(),
+        Distance.ofBaseUnits(0.45, Meters),
+        LinearVelocity.ofBaseUnits(v0, MetersPerSecond), // V sub 0 = sqrt(x^2/(2s)^2 + (72 in +
+        // ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
+        Angle.ofBaseUnits(theta, Radians));
+
+    fuelOnFly
+        .withTargetPosition(() -> FieldMirroringUtils.toCurrentAllianceTranslation(new Translation3d(4.5,
+            4.03, Meters.convertFrom(72, Inches))))
+        .withTargetTolerance(new Translation3d(0.5, 0.5, 0.1));
+
+    fuelOnFly
+        // Configure callbacks to visualize the flight trajectory of the projectile
+        .withProjectileTrajectoryDisplayCallBack(
+            // Callback for when the note will eventually hit the target (if configured)
+            (pose3ds) -> Logger.recordOutput("Flywheel/FuelProjectileSuccessfulShot", pose3ds.toArray(Pose3d[]::new)),
+            // Callback for when the note will eventually miss the target, or if no target
+            // is configured
+            (pose3ds) -> Logger.recordOutput("Flywheel/FuelProjectileUnsuccessfulShot",
+                pose3ds.toArray(Pose3d[]::new)));
+
+    fuelOnFly.enableBecomesGamePieceOnFieldAfterTouchGround();
+
+    SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
+  }
+
+  // Not working, Fix later (vu postulate)
+  public boolean isValidShot() {
+    final Pose3d currentPosition = new Pose3d(m_swerveSubstystem.getPose2d());
+    final Pose3d shooterPosition = currentPosition.plus(shooterOffset);
+    final Pose3d targetPosition = getTargetPosition();
+    
+
+    double rpm = getVelocityRPM();
+    double v0 = rpm * flywheelConversionFactor;
+    double x0 = m_swerveSubstystem.getPose2d().getX();
+    double y0 = m_swerveSubstystem.getPose2d().getY();
+    double dz = targetPosition.getZ() - shooterPosition.getZ();
+    double phi = m_swerveSubstystem.getPose2d().getRotation().getRadians();
+    double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond;
+    double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond;
+    
+    double t = (v0 * Math.cos(theta) + Math.sqrt(Math.pow(v0 * Math.cos(theta), 2) - (4 * 4.9 * dz))) / 9.8;
+    
+    double px = (v0 * Math.sin(theta) * Math.cos(phi) + v_robotX) * t + x0;
+    double py = (v0 * Math.sin(theta) * Math.sin(phi) + v_robotY) * t + y0;
+
+    // Check if blue works.
+    double blueX1 = 4.40, blueY1 = 4.40;
+    double blueX2 = 4.9, blueY2 = 3.75;
+    double minBlueX = Math.min(blueX1, blueX2);
+    double maxBlueX = Math.max(blueX1, blueX2);
+    double minBlueY = Math.min(blueY1, blueY2);
+    double maxBlueY = Math.max(blueY1, blueY2);
+
+    boolean insideBlue = 
+      (px >= minBlueX && px <= maxBlueX) &&
+      (py >= minBlueY && py <= maxBlueY);
+
+    // check if it goes into red
+    double redX1 = 16.54 - blueX1, redY1 = 8.07 - blueY1;
+    double redX2 = 16.54 - blueX2, redY2 = 8.07 - blueY2;
+    double minRedX = Math.min(redX1, redX2);
+    double maxRedX = Math.max(redX1, redX2);
+    double minRedY = Math.min(redY1, redY2);
+    double maxRedY = Math.max(redY1, redY2);
+
+    boolean insideRed = 
+      (px >= minRedX && px <= maxRedX) &&
+      (py >= minRedY && py <= maxRedY);
+
+    return insideBlue || insideRed;
   }
 
   @Override

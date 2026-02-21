@@ -85,12 +85,6 @@ public class RobotContainer {
               * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? -1 : 1)
               * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1));
 
-    SwerveInputStream driveHubLocked = driveAngularVelocity.copy()
-      .withControllerHeadingAxis(
-         () -> Math.sin(m_shooterSubsystem.getIdealShooterConditions()[1]),
-         () -> Math.cos(m_shooterSubsystem.getIdealShooterConditions()[1]))
-      .headingWhile(true);
-
   SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
       .allianceRelativeControl(false)
       .withControllerRotationAxis(() -> m_driverController.getRightX() * -1);
@@ -102,17 +96,17 @@ public class RobotContainer {
   Command driveFieldOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveAngularVelocity);
 
   Command driveRobotOrientedAngularVelocity = m_swerveSubsystem.driveFieldOriented(driveRobotOriented);
-  Command driveRobotOrientedHubLocked = m_swerveSubsystem.driveFieldOriented(driveHubLocked);
-
+  
   SwerveInputStream driveAimRedHub = driveDirectAngle.copy().aim(new Pose2d(12.1, 4.03, Rotation2d.kZero)).aimWhile(true);
   SwerveInputStream driveAimBlueHub = driveDirectAngle.copy().aim(new Pose2d(4.5, 4.03, Rotation2d.kZero)).aimWhile(true);
-
+  
   Command driveFieldOrientedRedHub = m_swerveSubsystem.driveFieldOriented(driveAimRedHub);
   Command driveFieldOrientedBlueHub = m_swerveSubsystem.driveFieldOriented(driveAimBlueHub);
-
+  
+  Command driveRobotOrientedHubLocked = new HubLock(m_swerveSubsystem, m_shooterSubsystem, m_driverController);
   Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
   Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_shooterSubsystem);
-  Command shootyBoi = new Shoot(m_shooterSubsystem, m_swerveSubsystem, m_intakeSubsystem);
+  Command shootyBoi = new Shoot(m_shooterSubsystem, m_intakeSubsystem);
 
   Command riseCommand = m_climberSubsystem.riseCommand();
   Command descendCommand = m_climberSubsystem.descendCommand();
