@@ -91,7 +91,8 @@ public class ShooterSubstystem extends SubsystemBase {
     double theta = Math.toRadians(65); // FIXED SHOOTER ANGLE
 
     double[] values = getIdealShooterConditions();
-    if(Double.isNaN(values[0])) return;
+    if (Double.isNaN(values[0]))
+      return;
 
     setTargetSpeedRPM(values[0]);
 
@@ -132,17 +133,24 @@ public class ShooterSubstystem extends SubsystemBase {
     final double theta = Math.toRadians(65.0);
     final double t_min = 0.5;
     final double t_max = 3.5;
+    final double shooterOffsetX = 0;
+    final double shooterOffsetY = 0;
+    final double shooterOffsetZ = 0;
+
 
     double dx = targetPosition.getX() - currentPosition.getX();
     double dy = targetPosition.getY() - currentPosition.getY();
     double dz = targetPosition.getZ() - currentPosition.getZ();
     double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond;
     double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond;
+    double w_robot = m_swerveSubstystem.getFieldVelocity().omegaRadiansPerSecond;
+    double v_rotX = -w_robot * shooterOffsetY;
+    double v_rotY = w_robot * shooterOffsetX;
 
     // Solves for t = 0 using some special technique called the BrentSolver.
     UnivariateFunction f = t -> {
-      double rx = dx - (v_robotX * t);
-      double ry = dy - (v_robotY * t);
+      double rx = dx - (v_robotX * t) - (v_rotX * t);
+      double ry = dy - (v_robotY * t) - (v_rotY * t);
       double r = Math.hypot(rx, ry);
       return Math.tan(theta) * r - (0.5 * g * t * t) - dz;
     };
@@ -154,7 +162,7 @@ public class ShooterSubstystem extends SubsystemBase {
     try {
       t = functionSolver.solve(100, f, t_min, t_max);
     } catch (Exception e) {
-      return new double[] {Double.NaN, Double.NaN};
+      return new double[] { Double.NaN, Double.NaN };
     }
 
     // Given t, now solve for v0 and phi.
@@ -171,7 +179,6 @@ public class ShooterSubstystem extends SubsystemBase {
 
     return new double[] { rotationalVelocityRPM, phi };
   }
-
 
   // TODO: WILL NEVER DO as prophesized by the Great Vu Postulate
   public void createSimulatedFuelProjectile() {

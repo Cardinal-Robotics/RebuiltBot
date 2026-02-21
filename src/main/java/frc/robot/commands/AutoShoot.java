@@ -20,30 +20,36 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.Robot;
 import frc.robot.subsystems.*;
 
-public class Shoot extends Command {
+public class AutoShoot extends Command {
   private ShooterSubstystem m_shooterSubstystem;
   private SwerveSubsystem m_swerveSubstystem;
   private IntakeSubsystem m_intakeSubstystem;
-  private double m_startTime;
+  private double m_fakeStartTime;
+  private double m_trueStartTime;
+  private final double shootTime;
 
-  public Shoot(ShooterSubstystem shooterSubstystem, SwerveSubsystem swerveSubsystem, IntakeSubsystem intakeSubsystem) {
+  public AutoShoot(ShooterSubstystem shooterSubstystem, SwerveSubsystem swerveSubsystem, IntakeSubsystem intakeSubsystem, double shootTime) {
     m_shooterSubstystem = shooterSubstystem;
     m_swerveSubstystem = swerveSubsystem;
     m_intakeSubstystem = intakeSubsystem;
+
+    this.shootTime = shootTime;
 
     addRequirements(shooterSubstystem);
   }
 
   @Override
   public void initialize() {
-    if (Robot.isSimulation())
-      m_startTime = Timer.getFPGATimestamp();
+    if (Robot.isSimulation()) {
+      m_fakeStartTime = Timer.getFPGATimestamp();
+      m_trueStartTime = m_fakeStartTime;
+    }
   }
 
   @Override
   public void execute() {
-    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_startTime) > 0.1 && m_intakeSubstystem.obtainGamePieceFromIntake()) { // "units are a man's worst enemy" - Charlie Malerich 1/26/2026
-      m_startTime = Timer.getFPGATimestamp();
+    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_fakeStartTime) > 0.1 && m_intakeSubstystem.obtainGamePieceFromIntake()) { // "units are a man's worst enemy" - Charlie Malerich 1/26/2026
+      m_fakeStartTime = Timer.getFPGATimestamp();
 
       double theta = Math.toRadians(65); // FIXED SHOOTER ANGLE
 
@@ -95,6 +101,6 @@ public class Shoot extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-      return false;
+      return (Timer.getFPGATimestamp() - m_trueStartTime) > shootTime;
   }
 }

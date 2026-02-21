@@ -1,13 +1,17 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.math.geometry.Pose2d;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import org.littletonrobotics.junction.Logger;
@@ -28,17 +32,41 @@ public class RobotContainer {
   private final VisionSubsystem m_visionSubsystem = new VisionSubsystem(m_swerveSubsystem);
   private final IntakeSubsystem m_intakeSubsystem = new IntakeSubsystem(m_swerveSubsystem);
   private final ClimberSubsystem m_climberSubsystem = new ClimberSubsystem();
+  private final IndexerSubsystem m_indexerSubsystem = new IndexerSubsystem();
   // -----------------------------------------------------------------------------------
 
+
+
+  
+  
+  
+  
+  private final SendableChooser<Command> m_autoChooser;
+  
+  
+  
+  
+  
+  
+
+
+
+  
+  
+  
   private final CommandXboxController m_driverController = new CommandXboxController(
-      OperatorConstants.kDriverControllerPort);
+    OperatorConstants.kDriverControllerPort);
+    
+    public RobotContainer() {
 
-  public RobotContainer() {
-    configureBindings();
-  }
-
-  // COMMANDS
-  // -----------------------------------------------------------------------------------
+      configureBindings();
+        // Register Named commands first before building chooser...
+            m_autoChooser = AutoBuilder.buildAutoChooser("Lucas' Auto");
+        SmartDashboard.putData("Auto Chooser", m_autoChooser);
+    }
+    
+    // COMMANDS
+    // -----------------------------------------------------------------------------------
 
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
       () -> m_driverController.getLeftY() * -1,
@@ -80,15 +108,17 @@ public class RobotContainer {
   SwerveInputStream driveAimBlueHub = driveDirectAngle.copy().aim(new Pose2d(4.5, 4.03, Rotation2d.kZero)).aimWhile(true);
 
   Command driveFieldOrientedRedHub = m_swerveSubsystem.driveFieldOriented(driveAimRedHub);
-
   Command driveFieldOrientedBlueHub = m_swerveSubsystem.driveFieldOriented(driveAimBlueHub);
 
   Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
-  Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_visionSubsystem);
-  Command shootyBoi = new Shoot(m_shooterSubsystem, m_swerveSubsystem);
+  Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_shooterSubsystem);
+  Command shootyBoi = new Shoot(m_shooterSubsystem, m_swerveSubsystem, m_intakeSubsystem);
 
   Command riseCommand = m_climberSubsystem.riseCommand();
   Command descendCommand = m_climberSubsystem.descendCommand();
+  Command indexerCommand = m_indexerSubsystem.spinIndexerCommand();
+  Command intakeCommand = m_intakeSubsystem.runIntakeMotor(.5);
+  Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
 
   // -----------------------------------------------------------------------------------
 
@@ -101,15 +131,35 @@ public class RobotContainer {
         }).finallyDo(() -> {
           Logger.recordOutput("Robot Relative", false);
         }));
-    m_driverController.x().toggleOnTrue(driveRobotOrientedHubLocked);
 
+    m_driverController.x().toggleOnTrue(driveRobotOrientedHubLocked);
     m_driverController.y().toggleOnTrue(driveAutoAlign);
-    m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button
-    m_driverController.rightTrigger().whileTrue(shootyBoi);
+    m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button - great vu postulate
+    m_driverController.rightTrigger().whileTrue(shootyBoi).whileTrue(indexerCommand);
     m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));
     m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
     m_driverController.povUp().whileTrue(descendCommand);
     m_driverController.povDown().whileTrue(riseCommand);
+    m_driverController.leftTrigger().whileTrue(intakeCommand).whileTrue(indexerCommand);
+    m_driverController.leftTrigger().whileFalse(stopIntakeCommand);
+
+
+            
+    NamedCommands.registerCommand("Print", Commands.print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"));
+    NamedCommands.registerCommand("Shoot", shootyBoi);
+    NamedCommands.registerCommand("Intake Up", m_intakeSubsystem.setIntakePivotCommand(90));
+    NamedCommands.registerCommand("Intake Down", m_intakeSubsystem.setIntakePivotCommand(0));
+    NamedCommands.registerCommand("Intake Start", intakeCommand);
+    NamedCommands.registerCommand("Run Indexer", indexerCommand);
+    NamedCommands.registerCommand("Intake Stop", stopIntakeCommand);
+    NamedCommands.registerCommand("Climber Rise", riseCommand);
+    NamedCommands.registerCommand("Climber Descend", descendCommand);
+    NamedCommands.registerCommand("Hub Lock", driveRobotOrientedHubLocked);
+    NamedCommands.registerCommand("Shooter Align", driveShooterAlign);
+    NamedCommands.registerCommand("Stop", Commands.runOnce(m_swerveSubsystem.getSwerveDrive()::lockPose, m_swerveSubsystem));
+    NamedCommands.registerCommand("Shoot3s", new AutoShoot(m_shooterSubsystem, m_swerveSubsystem, m_intakeSubsystem, 3));
+    NamedCommands.registerCommand("Shoot2s", new AutoShoot(m_shooterSubsystem, m_swerveSubsystem, m_intakeSubsystem, 2));
+    NamedCommands.registerCommand("Shoot5s", new AutoShoot(m_shooterSubsystem, m_swerveSubsystem, m_intakeSubsystem, 5));
 
     /*
      * m_driverController.x().onTrue(Commands.runOnce(() -> {
@@ -129,6 +179,6 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return new PathPlannerAuto("Lucas' Auto");
+    return m_autoChooser.getSelected();
   }
 }
