@@ -113,7 +113,7 @@ public class IntakeSubsystem extends SubsystemBase {
         IntakeSide.BACK,
         100);
 
-      this.m_intakeSimulation.addGamePiecesToIntake(80);
+      this.m_intakeSimulation.setGamePiecesCount(80);
   }
 
   public void setTargetAngle(double angle) {

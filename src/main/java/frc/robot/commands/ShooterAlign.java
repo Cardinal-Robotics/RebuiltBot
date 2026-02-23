@@ -43,6 +43,7 @@ public class ShooterAlign extends Command {
   public void initialize() {
     m_timer.reset();
     m_timer.start();
+    m_finished = false;
   }
 
   // Called every time the scheduler runs while the command is scheduled.

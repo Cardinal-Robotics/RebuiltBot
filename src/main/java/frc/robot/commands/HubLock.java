@@ -5,7 +5,14 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+
+import java.util.Optional;
+
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import edu.wpi.first.math.filter.SlewRateLimiter;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ShooterSubstystem;
@@ -23,7 +30,7 @@ public class HubLock extends Command {
   private SwerveInputStream swerveInput;
 
   public HubLock(SwerveSubsystem swerve, ShooterSubstystem shooter, CommandXboxController driveController) {
-    addRequirements(swerve);
+    //addRequirements(swerve);
 
     this.controller = driveController;
     this.shooter = shooter;
@@ -43,13 +50,20 @@ public class HubLock extends Command {
   }
 
   @Override
+  public void initialize() {
+    PPHolonomicDriveController.setRotationTargetOverride(() -> isScheduled() ? Optional.of(new Rotation2d(targetAngle)) : Optional.empty());
+  }
+
+  @Override
   public void execute() {
     double phi = shooter.getIdealShooterConditions()[1];
     if (Double.isNaN(phi))
       targetAngle = swerve.getPose2d().getRotation().getRadians();
     else targetAngle = phi;
 
-    this.swerve.driveFieldOriented(swerveInput.get());
+    if(!DriverStation.isAutonomousEnabled()) {
+      this.swerve.driveFieldOriented(swerveInput.get());
+    }
   }
 
   @Override

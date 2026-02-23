@@ -45,6 +45,48 @@
           "data": {
             "name": "Shoot3s"
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Start"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Copy of Balls"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Stop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shooter Align"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot3s"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Stop"
+          }
         }
       ]
     }
