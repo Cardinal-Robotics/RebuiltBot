@@ -13,16 +13,19 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ShooterSubstystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveInputStream;
 
-public class HubLock extends Command {
+public class AutoHubLock extends Command {
   CommandXboxController controller;
   ShooterSubstystem shooter;
   SwerveSubsystem swerve;
+
+  private double m_startTime;
 
   
   private final SlewRateLimiter phiRateLimiter = new SlewRateLimiter(Math.toRadians(180));
@@ -30,7 +33,7 @@ public class HubLock extends Command {
   private SwerveInputStream swerveInput;
   private boolean isEnabled = false;
 
-  public HubLock(SwerveSubsystem swerve, ShooterSubstystem shooter, CommandXboxController driveController) {
+  public AutoHubLock(SwerveSubsystem swerve, ShooterSubstystem shooter, CommandXboxController driveController) {
     //addRequirements(swerve);
 
     this.controller = driveController;
@@ -53,6 +56,8 @@ public class HubLock extends Command {
   @Override
   public void initialize() {
     PPHolonomicDriveController.setRotationTargetOverride(() -> isEnabled ? Optional.of(new Rotation2d(targetAngle)) : Optional.empty());
+    m_startTime = Timer.getFPGATimestamp();
+
     isEnabled = true;
   }
 
@@ -63,7 +68,7 @@ public class HubLock extends Command {
       targetAngle = swerve.getPose2d().getRotation().getRadians();
     else targetAngle = phi;
 
-      this.swerve.driveFieldOriented(swerveInput.get());
+    this.swerve.driveFieldOriented(swerveInput.get());
   }
 
   @Override
@@ -73,6 +78,6 @@ public class HubLock extends Command {
 
   @Override
   public boolean isFinished() {
-    return false;
+    return (Timer.getFPGATimestamp() - m_startTime) > 1;
   }
 }

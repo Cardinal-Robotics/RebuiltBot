@@ -104,6 +104,7 @@ public class RobotContainer {
   Command driveFieldOrientedBlueHub = m_swerveSubsystem.driveFieldOriented(driveAimBlueHub);
   
   Command driveRobotOrientedHubLocked = new HubLock(m_swerveSubsystem, m_shooterSubsystem, m_driverController);
+  Command autoHubLock = new AutoHubLock(m_swerveSubsystem, m_shooterSubsystem, m_driverController);
   Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
   Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_shooterSubsystem);
   Command shootyBoi = new Shoot(m_shooterSubsystem, m_intakeSubsystem);
@@ -136,6 +137,7 @@ public class RobotContainer {
     m_driverController.povDown().whileTrue(riseCommand);
     m_driverController.leftTrigger().whileTrue(intakeCommand).whileTrue(indexerCommand);
     m_driverController.leftTrigger().whileFalse(stopIntakeCommand);
+    m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
 
 
             
@@ -148,11 +150,11 @@ public class RobotContainer {
     NamedCommands.registerCommand("Intake Stop", stopIntakeCommand);
     NamedCommands.registerCommand("Climber Rise", riseCommand);
     NamedCommands.registerCommand("Climber Descend", descendCommand);
-    NamedCommands.registerCommand("Hub Lock", driveRobotOrientedHubLocked);
+    NamedCommands.registerCommand("Hub Lock", autoHubLock);
     NamedCommands.registerCommand("Shooter Align", driveShooterAlign);
     NamedCommands.registerCommand("Stop", Commands.runOnce(m_swerveSubsystem.getSwerveDrive()::lockPose, m_swerveSubsystem));
     NamedCommands.registerCommand("Shoot3s", new AutoShoot(m_shooterSubsystem, m_swerveSubsystem, m_intakeSubsystem, 3));
-    NamedCommands.registerCommand("Shoot2s", new AutoShoot(m_shooterSubsystem, m_swerveSubsystem, m_intakeSubsystem, 2));
+    NamedCommands.registerCommand("Shoot1s", new AutoShoot(m_shooterSubsystem, m_swerveSubsystem, m_intakeSubsystem, 1));
     NamedCommands.registerCommand("Shoot5s", new AutoShoot(m_shooterSubsystem, m_swerveSubsystem, m_intakeSubsystem, 5));
 
     /*
