@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SimulationSubsystem extends SubsystemBase {
-  SimulatedArena m_arena = SimulatedArena.getInstance();
+  SimulatedArena m_arena;
 
   protected static Translation2d blueDepotBottomRightCorner = new Translation2d(0.02, 5.53);
   protected static Translation2d redDepotBottomRightCorner = new Translation2d(16.0274, 1.646936);

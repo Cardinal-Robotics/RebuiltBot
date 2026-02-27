@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IndexerSubsystem extends SubsystemBase {
 
-  private TalonSRX m_indexerMotor = new TalonSRX(2);
+  private TalonSRX m_indexerMotor = new TalonSRX(24);
 
   public IndexerSubsystem() {}
 

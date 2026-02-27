@@ -45,9 +45,9 @@ import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 
 public class ShooterSubstystem extends SubsystemBase {
-  private SparkMax m_shootMotor = new SparkMax(34, MotorType.kBrushless);
+  private SparkMax m_shootMotor = new SparkMax(30, MotorType.kBrushless);
 
-  private SparkMax m_uptakeMotor = new SparkMax(348, MotorType.kBrushless);
+  private SparkMax m_uptakeMotor = new SparkMax(31, MotorType.kBrushless);
 
   private DCMotor m_neoGearbox = DCMotor.getNEO(1);
 

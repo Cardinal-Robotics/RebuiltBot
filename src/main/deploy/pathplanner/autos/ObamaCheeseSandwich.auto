@@ -5,31 +5,6 @@
     "data": {
       "commands": [
         {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "Hub Lock"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Stop"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shoot1s"
-                }
-              }
-            ]
-          }
-        },
-        {
           "type": "parallel",
           "data": {
             "commands": [
@@ -74,6 +49,24 @@
                 "type": "named",
                 "data": {
                   "name": "Shoot3s"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Climber Rise"
+                }
+              },
+              {
+                "type": "path",
+                "data": {
+                  "pathName": "LeftLeftClimb"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Climber Descend"
                 }
               }
             ]

@@ -50,7 +50,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   private DCMotor m_neoGearbox = DCMotor.getNEO(1);
 
-  private SparkMax m_pivotMotor = new SparkMax(328, MotorType.kBrushless);
+  private SparkMax m_pivotMotor = new SparkMax(32, MotorType.kBrushless);
   private SparkMaxSim m_pivotMotorSim = new SparkMaxSim(m_pivotMotor, m_neoGearbox);
   private SingleJointedArmSim m_intakeArmSim = new SingleJointedArmSim(m_neoGearbox,
       36.0,
@@ -70,7 +70,7 @@ public class IntakeSubsystem extends SubsystemBase {
       0 // starting angle
   ));
 
-  private TalonSRX m_intakeMotor = new TalonSRX(148);
+  private TalonSRX m_intakeMotor = new TalonSRX(27);
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem(SwerveSubsystem swerveSubsystem) {
