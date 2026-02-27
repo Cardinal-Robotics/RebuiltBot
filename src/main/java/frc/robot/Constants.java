@@ -21,7 +21,7 @@ public final class Constants {
     }
 
     public static final class DriveConstants {
-        public static final double kMaxSpeed = 3;
+        public static final double kMaxSpeed = 3.5;
 
         // PID values for translation (moving).
         public static final double kPTrans = 5;

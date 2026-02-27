@@ -22,7 +22,7 @@ public class Robot extends LoggedRobot {
   public Robot() {
     Logger.recordMetadata("Rebuilt", "UnnamedBot"); // Set a metadata value
 
-    if (Robot.isSimulation())
+    //if (Robot.isSimulation())
       Logger.addDataReceiver(new NT4Publisher());
 
     Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs/"));

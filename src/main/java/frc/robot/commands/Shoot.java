@@ -25,11 +25,13 @@ import frc.robot.subsystems.*;
 public class Shoot extends Command {
   private ShooterSubstystem m_shooterSubstystem;
   private IntakeSubsystem m_intakeSubstystem;
+  private IndexerSubsystem m_indexerSubstystem;
   private double m_startTime;
 
-  public Shoot(ShooterSubstystem shooterSubstystem, IntakeSubsystem intakeSubsystem) {
+  public Shoot(ShooterSubstystem shooterSubstystem, IntakeSubsystem intakeSubsystem, IndexerSubsystem indexer) {
     m_shooterSubstystem = shooterSubstystem;
     m_intakeSubstystem = intakeSubsystem;
+    m_indexerSubstystem = indexer;
 
     addRequirements(shooterSubstystem);
   }
@@ -42,7 +44,15 @@ public class Shoot extends Command {
 
   @Override
   public void execute() {
-    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_startTime) > 0.1) { // "units are a man's worst enemy" -
+    if(true /* m_shooterSubstystem.atTargetSpeed() */) {
+      m_shooterSubstystem.setUptake(0.6);
+      m_indexerSubstystem.spinIndexer();
+    } else { 
+      m_shooterSubstystem.setUptake(0.0);
+      m_indexerSubstystem.stopIndexer();
+    }
+
+   /*  if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_startTime) > 0.1) { // "units are a man's worst enemy" -
                                                                                   // Charlie Malerich 1/26/2026
       m_startTime = Timer.getFPGATimestamp();
 
@@ -54,19 +64,21 @@ public class Shoot extends Command {
         return;
 
       // Only shoot if we can actually make it and if we have the ammo for it.
-/*       if (m_shooterSubstystem.isValidShot())
-        return; */
+      if (m_shooterSubstystem.isValidShot())
+        return;
       if (!m_intakeSubstystem.obtainGamePieceFromIntake())
         return;
 
       m_shooterSubstystem.setTargetSpeedRPM(RPM);
       this.m_shooterSubstystem.createSimulatedFuelProjectile(); // shoot ball
-    }
+    } */
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    m_shooterSubstystem.setUptake(0.0);
+    m_indexerSubstystem.stopIndexer();
   }
 
   // Returns true when the command should end.

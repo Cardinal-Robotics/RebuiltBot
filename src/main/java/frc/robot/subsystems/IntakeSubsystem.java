@@ -18,6 +18,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.sim.SparkMaxSim;
@@ -78,29 +79,28 @@ public class IntakeSubsystem extends SubsystemBase {
 
     SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
-    pivotConfig.idleMode(IdleMode.kBrake);
-    pivotConfig.closedLoop.pid(2, 0.002, 0.005);
+    pivotConfig.idleMode(IdleMode.kCoast);
+    pivotConfig.inverted(false);
+
+/*     pivotConfig.closedLoop.pid(2, 0.002, 0.005);
     if(Robot.isSimulation()) pivotConfig.closedLoop.pid(0.005, 0, 0);
 
     pivotConfig.closedLoop.minOutput(-0.1);
     pivotConfig.closedLoop.maxOutput(0.1);
+    pivotConfig.closedLoop.maxMotion.cruiseVelocity(50);
 
-/*     if (Robot.isSimulation()) {
-      pivotConfig.closedLoop.pid(0.1, 0.002, 0.005);
-
-    } */
-
-
+        // 1/36 is 1 rotation, 360 is degrees for every rotation, 60 is seconds for every minute 
     pivotConfig.encoder.positionConversionFactor(360 / 36);
-
+    pivotConfig.encoder.velocityConversionFactor(360.0f / 36.0f / 60.0f); */
     m_pivotMotor.getEncoder().getPosition(); // 1/36 - 1 rotation of the arm is 36 of the motor 4:3:3
 
     m_pivotMotor.configure(pivotConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    m_pivotMotor.getEncoder().setPosition(90);
-    ;
+    m_intakeMotor.setInverted(InvertType.InvertMotorOutput);
+    m_pivotMotor.getEncoder().setPosition(0);
+  
 
     // Following only runs in sim:
     if (!Robot.isSimulation())
@@ -117,7 +117,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void setTargetAngle(double angle) {
-    m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
+    m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kMAXMotionPositionControl);
   }
 
   public void setIntakeSpeed(double speed) {
@@ -157,7 +157,12 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void setIntakePivot(double angle) {
     Logger.recordOutput("Ideal Angle", angle);
-    m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
+    
+    //m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
+  }
+
+  public Command nudgeForward() {
+    return runEnd(() -> m_pivotMotor.set(0.025), () -> m_pivotMotor.set(0.0));
   }
 
   public Command setIntakePivotCommand(double angle) {

@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.TalonSRXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -17,11 +18,17 @@ public class IndexerSubsystem extends SubsystemBase {
 
   private TalonSRX m_indexerMotor = new TalonSRX(24);
 
-  public IndexerSubsystem() {}
+  public IndexerSubsystem() {
+    m_indexerMotor.setInverted(InvertType.InvertMotorOutput);
+  }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  public void stopIndexer() {
+    m_indexerMotor.set(TalonSRXControlMode.PercentOutput, 0.0);
   }
 
   public void spinIndexer() {

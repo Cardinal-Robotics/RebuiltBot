@@ -20,6 +20,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import swervelib.simulation.ironmaple.utils.FieldMirroringUtils;
@@ -39,13 +40,14 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkMax;
 import com.pathplanner.lib.util.FlippingUtil;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 
 public class ShooterSubstystem extends SubsystemBase {
-  private SparkMax m_shootMotor = new SparkMax(30, MotorType.kBrushless);
+  private SparkMax m_shootMotor = new SparkMax(35, MotorType.kBrushless);
 
   private SparkMax m_uptakeMotor = new SparkMax(31, MotorType.kBrushless);
 
@@ -70,12 +72,14 @@ public class ShooterSubstystem extends SubsystemBase {
   public ShooterSubstystem(SwerveSubsystem swerveSubsystem) {
     SparkMaxConfig shootConfig = new SparkMaxConfig();
 
-    shootConfig.idleMode(IdleMode.kBrake);
-    shootConfig.closedLoop.pid(0.0005, 0.001, 0);
+    shootConfig.idleMode(IdleMode.kCoast);
+    shootConfig.closedLoop.pidf(0, 0, 0, 0.000165);
+    //shootConfig.closedLoop.allowedClosedLoopError(100, ClosedLoopSlot.kSlot0);
+    shootConfig.inverted(true);
 
     SparkMaxConfig uptakeConfig = new SparkMaxConfig();
     uptakeConfig.idleMode(IdleMode.kBrake);
-    uptakeConfig.closedLoop.pid(0.0005, 0.001, 0);
+    uptakeConfig.inverted(true);
 
     m_shootMotor.configure(
         shootConfig,
@@ -92,23 +96,27 @@ public class ShooterSubstystem extends SubsystemBase {
 
     m_swerveSubstystem = swerveSubsystem;
 
-    SmartDashboard.putNumber("Shooty Speed", 0);
+    SmartDashboard.putNumber("RPM", 4630);
   }
 
   @Override
   public void periodic() {
-
     if (!DriverStation.isEnabled()) {
       m_shootMotor.getClosedLoopController().setIAccum(0);
+
+      
     }
+    setTargetSpeedRPM(SmartDashboard.getNumber("RPM", flywheelConversionFactor));
+
+
 
     // This method will be called once per scheduler run
 
-    double[] values = getIdealShooterConditions();
+/*     double[] values = getIdealShooterConditions();
     if (Double.isNaN(values[0]))
       return;
 
-    setTargetSpeedRPM(values[0]);
+    setTargetSpeedRPM(values[0]); */
 
     Logger.recordOutput(
         "Shooter/SetpointRPM",
@@ -117,6 +125,9 @@ public class ShooterSubstystem extends SubsystemBase {
     Logger.recordOutput(
         "Shooter/SimRPM",
         m_flywheelSim.getAngularVelocityRPM());
+    Logger.recordOutput(
+        "Shooter/RPM",
+        m_shootMotor.getEncoder().getVelocity());
   }
 
   private Pose3d getTargetPosition() {
@@ -299,12 +310,23 @@ public class ShooterSubstystem extends SubsystemBase {
   }
 
   public double getVelocityRPM() {
-    return m_flywheelSim.getAngularVelocityRPM();
+    if(Robot.isSimulation()) return m_flywheelSim.getAngularVelocityRPM();
+    return m_shootMotor.getEncoder().getVelocity();
+  }
+
+  public boolean atTargetSpeed() {
+    double setpoint = m_shootMotor.getClosedLoopController().getSetpoint();
+    double error = Math.abs(setpoint - m_shootMotor.getEncoder().getVelocity());
+    return error <= 200;
   }
 
   public void setTargetSpeedRPM(double targetSpeed) {
     m_shootMotor
         .getClosedLoopController()
         .setSetpoint(targetSpeed, ControlType.kVelocity);
+  }
+
+  public void setUptake(double speed) {
+    m_uptakeMotor.set(speed);
   }
 }
