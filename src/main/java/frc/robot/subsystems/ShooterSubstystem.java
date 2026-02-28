@@ -76,6 +76,8 @@ public class ShooterSubstystem extends SubsystemBase {
     shootConfig.closedLoop.pidf(0, 0, 0, 0.000165);
     //shootConfig.closedLoop.allowedClosedLoopError(100, ClosedLoopSlot.kSlot0);
     shootConfig.inverted(true);
+/*     shootConfig.encoder.quadratureMeasurementPeriod(10);
+    shootConfig.encoder.quadratureAverageDepth(1); */
 
     SparkMaxConfig uptakeConfig = new SparkMaxConfig();
     uptakeConfig.idleMode(IdleMode.kBrake);
@@ -96,7 +98,8 @@ public class ShooterSubstystem extends SubsystemBase {
 
     m_swerveSubstystem = swerveSubsystem;
 
-    SmartDashboard.putNumber("RPM", 4630);
+    //SmartDashboard.putNumber("RPM", 4630);
+    SmartDashboard.putNumber("RPM", 0);
   }
 
   @Override

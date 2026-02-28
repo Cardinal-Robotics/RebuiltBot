@@ -7,6 +7,7 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.parser.SwerveParser;
 import swervelib.simulation.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
 import swervelib.SwerveDrive;
+import swervelib.SwerveModule;
 
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.trajectory.PathPlannerTrajectoryState;
@@ -16,6 +17,7 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.*;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -45,6 +47,7 @@ public class SwerveSubsystem extends SubsystemBase {
   private SwerveDrive m_swerveDrive; // create variable so the whole class can see it
 
   public RobotConfig config;
+  public SendableChooser<Integer> m_module = new SendableChooser<>();
 
   public SwerveSubsystem() {
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH; // quoth Lil Vu: "tells YAGSL to print a bunch of stuff"
@@ -70,7 +73,19 @@ public class SwerveSubsystem extends SubsystemBase {
     SmartDashboard.putData("Field", m_swerveDrive.field);
     m_swerveDrive.resetOdometry(kInitialRedRobotPose);
 
+    m_swerveDrive.setChassisDiscretization(true, 0.02);
+    m_swerveDrive.setHeadingCorrection(true);
+
     setupPathPlanner();
+    m_module.setDefaultOption("None", 0);
+    m_module.addOption("None", 0);
+    m_module.addOption("FL", 1);
+    m_module.addOption("FR",2);
+    m_module.addOption("BL", 3);
+    m_module.addOption("BR", 4);
+    SmartDashboard.putData("Motor Chooser", m_module);
+
+    resetGyro();
   }
 
   @Override
@@ -163,6 +178,15 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public ChassisSpeeds getFieldVelocity() {
     return m_swerveDrive.getFieldVelocity();
+  }
+
+
+  public void resetGyro() {
+    m_swerveDrive.zeroGyro();
+  }
+
+  public Command resetGyroCommand() {
+    return runOnce(this::resetGyro);
   }
 
   public void setupPathPlanner() {
