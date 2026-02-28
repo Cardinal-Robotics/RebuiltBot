@@ -79,7 +79,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     SparkMaxConfig pivotConfig = new SparkMaxConfig();
 
-    pivotConfig.idleMode(IdleMode.kCoast);
+    pivotConfig.idleMode(IdleMode.kBrake);
     pivotConfig.inverted(false);
 
 /*     pivotConfig.closedLoop.pid(2, 0.002, 0.005);
