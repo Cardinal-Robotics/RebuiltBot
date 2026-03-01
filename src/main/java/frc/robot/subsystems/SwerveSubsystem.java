@@ -47,7 +47,6 @@ public class SwerveSubsystem extends SubsystemBase {
   private SwerveDrive m_swerveDrive; // create variable so the whole class can see it
 
   public RobotConfig config;
-  public SendableChooser<Integer> m_module = new SendableChooser<>();
 
   public SwerveSubsystem() {
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH; // quoth Lil Vu: "tells YAGSL to print a bunch of stuff"
@@ -77,14 +76,6 @@ public class SwerveSubsystem extends SubsystemBase {
     m_swerveDrive.setHeadingCorrection(true);
 
     setupPathPlanner();
-    m_module.setDefaultOption("None", 0);
-    m_module.addOption("None", 0);
-    m_module.addOption("FL", 1);
-    m_module.addOption("FR",2);
-    m_module.addOption("BL", 3);
-    m_module.addOption("BR", 4);
-    SmartDashboard.putData("Motor Chooser", m_module);
-
     resetGyro();
   }
 
@@ -93,6 +84,19 @@ public class SwerveSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     Logger.recordOutput("YAGSL", m_swerveDrive.getPose());
     m_swerveDrive.updateOdometry();
+
+    //Potentially fix issue where robot turns the other way?
+    m_swerveDrive.getGyro().setOffset(new Rotation3d(Rotation2d.k180deg));
+
+/*     Logger.recordOutput("SWERVE_DEBUG/gyro", m_swerveDrive.getYaw());
+    Logger.recordOutput("SWERVE_DEBUG/cachedGyro", m_swerveDrive.getGyroRotation3d());
+    Logger.recordOutput("SWERVE_DEBUG/heading", m_swerveDrive.getPose().getRotation());
+    
+    for(SwerveModule module : m_swerveDrive.getModules()) {
+      module.setAngle(45);
+      module.getDriveMotor().set(0.25);
+    } */
+
   }
 
   @Override
