@@ -82,16 +82,16 @@ public class IntakeSubsystem extends SubsystemBase {
     pivotConfig.idleMode(IdleMode.kBrake);
     pivotConfig.inverted(false);
 
-/*     pivotConfig.closedLoop.pid(2, 0.002, 0.005);
+    pivotConfig.closedLoop.pid(2, 0, 0.005);
     if(Robot.isSimulation()) pivotConfig.closedLoop.pid(0.005, 0, 0);
 
     pivotConfig.closedLoop.minOutput(-0.1);
     pivotConfig.closedLoop.maxOutput(0.1);
-    pivotConfig.closedLoop.maxMotion.cruiseVelocity(50);
+    pivotConfig.closedLoop.maxMotion.cruiseVelocity(360);
 
         // 1/36 is 1 rotation, 360 is degrees for every rotation, 60 is seconds for every minute 
     pivotConfig.encoder.positionConversionFactor(360 / 36);
-    pivotConfig.encoder.velocityConversionFactor(360.0f / 36.0f / 60.0f); */
+    pivotConfig.encoder.velocityConversionFactor(360.0f / 36.0f / 60.0f);
     m_pivotMotor.getEncoder().getPosition(); // 1/36 - 1 rotation of the arm is 36 of the motor 4:3:3
 
     m_pivotMotor.configure(pivotConfig,
@@ -116,9 +116,6 @@ public class IntakeSubsystem extends SubsystemBase {
       this.m_intakeSimulation.setGamePiecesCount(8);
   }
 
-  public void setTargetAngle(double angle) {
-    m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kMAXMotionPositionControl);
-  }
 
   public void setIntakeSpeed(double speed) {
     m_intakeMotor.set(TalonSRXControlMode.PercentOutput, speed);
@@ -155,10 +152,9 @@ public class IntakeSubsystem extends SubsystemBase {
         BatterySim.calculateDefaultBatteryLoadedVoltage(m_intakeArmSim.getCurrentDrawAmps()));
   }
 
-  public void setIntakePivot(double angle) {
-    Logger.recordOutput("Ideal Angle", angle);
-    
-    //m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
+  public void setIntakePivot(double angle) {    
+    m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
+    Logger.recordOutput("Intake/IdealPivot", angle);
   }
 
   public Command nudgeForward() {

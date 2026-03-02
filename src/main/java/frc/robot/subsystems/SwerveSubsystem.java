@@ -74,9 +74,12 @@ public class SwerveSubsystem extends SubsystemBase {
 
     m_swerveDrive.setChassisDiscretization(true, 0.02);
     m_swerveDrive.setHeadingCorrection(true);
+    
+    m_swerveDrive.getGyro().setOffset(new Rotation3d(Rotation2d.k180deg));
+   
+    m_swerveDrive.zeroGyro();
 
     setupPathPlanner();
-    resetGyro();
   }
 
   @Override
@@ -86,7 +89,6 @@ public class SwerveSubsystem extends SubsystemBase {
     m_swerveDrive.updateOdometry();
 
     //Potentially fix issue where robot turns the other way?
-    m_swerveDrive.getGyro().setOffset(new Rotation3d(Rotation2d.k180deg));
 
 /*     Logger.recordOutput("SWERVE_DEBUG/gyro", m_swerveDrive.getYaw());
     Logger.recordOutput("SWERVE_DEBUG/cachedGyro", m_swerveDrive.getGyroRotation3d());

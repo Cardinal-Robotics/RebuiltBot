@@ -73,7 +73,7 @@ public class ShooterSubstystem extends SubsystemBase {
     SparkMaxConfig shootConfig = new SparkMaxConfig();
 
     shootConfig.idleMode(IdleMode.kCoast);
-    shootConfig.closedLoop.pidf(0, 0, 0, 0.000165);
+    shootConfig.closedLoop.pid(0.0001, 0, 0);
     //shootConfig.closedLoop.allowedClosedLoopError(100, ClosedLoopSlot.kSlot0);
     shootConfig.inverted(true);
 /*     shootConfig.encoder.quadratureMeasurementPeriod(10);
@@ -100,6 +100,7 @@ public class ShooterSubstystem extends SubsystemBase {
 
     //SmartDashboard.putNumber("RPM", 4630);
     SmartDashboard.putNumber("RPM", 0);
+    SmartDashboard.putNumber("kF", 0);
   }
 
   @Override
@@ -109,6 +110,7 @@ public class ShooterSubstystem extends SubsystemBase {
 
       
     }
+
     setTargetSpeedRPM(SmartDashboard.getNumber("RPM", flywheelConversionFactor));
 
 
@@ -120,6 +122,7 @@ public class ShooterSubstystem extends SubsystemBase {
       return;
 
     setTargetSpeedRPM(values[0]); */
+
 
     Logger.recordOutput(
         "Shooter/SetpointRPM",
@@ -324,9 +327,14 @@ public class ShooterSubstystem extends SubsystemBase {
   }
 
   public void setTargetSpeedRPM(double targetSpeed) {
+    double kF = 0.001945;
+    double kS = 0.15;
+
+    double feedforwardVoltage = targetSpeed * kF + kS;
+
     m_shootMotor
         .getClosedLoopController()
-        .setSetpoint(targetSpeed, ControlType.kVelocity);
+        .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage);
   }
 
   public void setUptake(double speed) {
