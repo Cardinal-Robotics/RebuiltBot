@@ -7,6 +7,7 @@ package frc.robot.subsystems.vision;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.apriltag.*;
 import frc.robot.Robot;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -17,11 +18,11 @@ import org.photonvision.targeting.PhotonPipelineResult;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import java.io.File;
 import java.util.Optional;
 
 public class VisionSubsystem extends SubsystemBase {
-  private final AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(
-      AprilTagFields.k2026RebuiltWelded);
+  private AprilTagFieldLayout tagLayout;
 
   private final SwerveSubsystem m_swerveSubsystem;
   private final Camera leftCamera, rightCamera;
@@ -29,6 +30,15 @@ public class VisionSubsystem extends SubsystemBase {
 
   public VisionSubsystem(SwerveSubsystem swerveSubsystem) {
     this.m_swerveSubsystem = swerveSubsystem;
+
+    // try {
+    //   File tagLayoutJSON = new File(Filesystem.getDeployDirectory(), "");
+    //   this.tagLayout = AprilTagFieldLayout.loadFromResource(tagLayoutJSON.getAbsolutePath() + "/field_map_mar_05_16_23_25.json");
+    // } catch (Exception e) {
+      //   throw new RuntimeException(e);
+      // }
+
+      this.tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
     this.visionSim = new VisionSystemSim("main");
     this.visionSim.addAprilTags(tagLayout);

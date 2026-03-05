@@ -77,10 +77,10 @@ public class RobotContainer {
             .withControllerHeadingAxis(
                     () -> m_driverController.getRightX()
                             * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1 : -1)
-                            * (SmartDashboard.getBoolean("Invert Rotation", false) ? 1 : -1),
+                            * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1),
                     () -> m_driverController.getRightY()
                             * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1 : -1)
-                            * (SmartDashboard.getBoolean("Invert Rotation", false) ? 1 : -1));
+                            * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1));
 
     SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
             .allianceRelativeControl(false)
@@ -106,7 +106,7 @@ public class RobotContainer {
     Command riseCommand = m_climberSubsystem.riseCommand();
     Command descendCommand = m_climberSubsystem.descendCommand();
     Command indexerCommand = m_indexerSubsystem.spinIndexerCommand();
-    Command intakeCommand = m_intakeSubsystem.runIntakeMotor(.5); //temporary (vu postulate)
+    Command intakeCommand = m_intakeSubsystem.runIntakeMotor(0.55); //temporary (vu postulate)
     Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
 
     // -----------------------------------------------------------------------------------
