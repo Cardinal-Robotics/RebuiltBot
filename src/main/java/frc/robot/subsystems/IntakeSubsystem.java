@@ -153,7 +153,7 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void setIntakePivot(double angle) {    
-    m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
+    //m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
     Logger.recordOutput("Intake/IdealPivot", angle);
   }
 

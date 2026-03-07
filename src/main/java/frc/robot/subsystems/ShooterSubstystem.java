@@ -4,47 +4,53 @@
 
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Volts;
 
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.solvers.BrentSolver;
 import org.littletonrobotics.junction.Logger;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.spark.ClosedLoopSlot;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkClosedLoopController.ArbFFUnits;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Robot;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import swervelib.simulation.ironmaple.utils.FieldMirroringUtils;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
-import edu.wpi.first.wpilibj.simulation.FlywheelSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-import edu.wpi.first.wpilibj.simulation.BatterySim;
-import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.math.system.LinearSystem;
-import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.numbers.N1;
-
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkMaxConfig;
-import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.sim.SparkMaxSim;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkMax;
-import com.pathplanner.lib.util.FlippingUtil;
-import com.revrobotics.PersistMode;
-import com.revrobotics.ResetMode;
 
 public class ShooterSubstystem extends SubsystemBase {
   private SparkMax m_shootMotor = new SparkMax(35, MotorType.kBrushless);
@@ -64,20 +70,34 @@ public class ShooterSubstystem extends SubsystemBase {
 
   private FlywheelSim m_flywheelSim = new FlywheelSim(m_linearSystemProfile, m_neoGearbox);
 
-  private final double theta = Math.toRadians(65);
+  private final double theta = Math.toRadians(10);
   private final double wheelRadiusMeters = Meters.convertFrom(2, Inches);
   private final double flywheelConversionFactor = (2 * Math.PI * wheelRadiusMeters) / 60.0;
   private final Transform3d shooterOffset = new Transform3d(0, 0, 0.45, Rotation3d.kZero);
 
+  private SysIdRoutine routine = new SysIdRoutine(
+      new SysIdRoutine.Config(),
+      new SysIdRoutine.Mechanism(
+        (voltage) -> m_shootMotor.setVoltage(voltage.in(Volts)), 
+        null,
+        this));
+
   public ShooterSubstystem(SwerveSubsystem swerveSubsystem) {
+    SmartDashboard.putData(routine.dynamic(Direction.kForward).withName("Forward Dynamic"));
+    SmartDashboard.putData(routine.dynamic(Direction.kReverse).withName("Reverse Dynamic"));
+    SmartDashboard.putData(routine.quasistatic(Direction.kForward).withName("Forward Quasistatic"));
+    SmartDashboard.putData(routine.quasistatic(Direction.kReverse).withName("Reverse Quasistatic"));
+
     SparkMaxConfig shootConfig = new SparkMaxConfig();
 
     shootConfig.idleMode(IdleMode.kCoast);
-    shootConfig.closedLoop.pid(0.0001, 0, 0);
-    //shootConfig.closedLoop.allowedClosedLoopError(100, ClosedLoopSlot.kSlot0);
+    shootConfig.closedLoop.pid(0.00019762, 0, 0);
+    // shootConfig.closedLoop.allowedClosedLoopError(100, ClosedLoopSlot.kSlot0);
     shootConfig.inverted(true);
-/*     shootConfig.encoder.quadratureMeasurementPeriod(10);
-    shootConfig.encoder.quadratureAverageDepth(1); */
+    
+    shootConfig.encoder.quadratureMeasurementPeriod(10);
+    shootConfig.encoder.quadratureAverageDepth(1);
+    
 
     SparkMaxConfig uptakeConfig = new SparkMaxConfig();
     uptakeConfig.idleMode(IdleMode.kBrake);
@@ -98,7 +118,7 @@ public class ShooterSubstystem extends SubsystemBase {
 
     m_swerveSubstystem = swerveSubsystem;
 
-    //SmartDashboard.putNumber("RPM", 4630);
+    // SmartDashboard.putNumber("RPM", 4630);
     SmartDashboard.putNumber("RPM", 0);
     SmartDashboard.putNumber("kF", 0);
   }
@@ -108,25 +128,23 @@ public class ShooterSubstystem extends SubsystemBase {
     if (!DriverStation.isEnabled()) {
       m_shootMotor.getClosedLoopController().setIAccum(0);
 
-      
     }
 
-    setTargetSpeedRPM(SmartDashboard.getNumber("RPM", flywheelConversionFactor));
-
-
+    //setTargetSpeedRPM(SmartDashboard.getNumber("RPM", flywheelConversionFactor));
 
     // This method will be called once per scheduler run
 
-/*     double[] values = getIdealShooterConditions();
+    
+    double[] values = getIdealShooterConditions();
     if (Double.isNaN(values[0]))
-      return;
-
-    setTargetSpeedRPM(values[0]); */
-
-
+    return;
+    
+    setTargetSpeedRPM(values[0]);
+    
+/* 
     Logger.recordOutput(
         "Shooter/SetpointRPM",
-        m_shootMotor.getClosedLoopController().getSetpoint());
+        m_shootMotor.getClosedLoopController().getSetpoint()); */
 
     Logger.recordOutput(
         "Shooter/SimRPM",
@@ -170,7 +188,7 @@ public class ShooterSubstystem extends SubsystemBase {
     final double g = 9.8;
     final double theta = this.theta;
     final double t_min = 0.5;
-    final double t_max = 3.5;
+    final double t_max = 5;
 
     double[] netTranslation = calculateNetTargetTranslation();
 
@@ -178,15 +196,23 @@ public class ShooterSubstystem extends SubsystemBase {
     double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond;
     double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond;
     double w_robot = m_swerveSubstystem.getFieldVelocity().omegaRadiansPerSecond;
-    double v_rotX = -w_robot * shooterOffset.getY();
-    double v_rotY = w_robot * shooterOffset.getX();
 
     // Solves for t = 0 using some special technique called the BrentSolver.
     UnivariateFunction f = t -> {
-      double rx = dx - (v_robotX * t) - (v_rotX * t);
-      double ry = dy - (v_robotY * t) - (v_rotY * t);
-      double r = Math.hypot(rx, ry);
-      return Math.tan(theta) * r - (0.5 * g * t * t) - dz;
+      double phi = Math.atan2(dy - v_robotY * t, dx - v_robotX * t);
+      
+      double v_ySolution = (dy - v_robotY * t) / (Math.sin(theta) * Math.sin(phi));
+      double interceptValue = v_ySolution;
+
+      // If dy - v_robotY = 0 for some reason, it will be NaN because it has already reached the optimal target location on the y-axis. Instead focus on the x-axis.
+      if(Double.isNaN(v_ySolution)) {
+        double v_xSolution = (dx - v_robotX * t) / (Math.sin(theta) * Math.cos(phi));
+        interceptValue = v_xSolution;
+      }
+
+      double v_zSolution = (dz + 4.9 * t * t) / (Math.cos(theta));
+
+      return v_zSolution - interceptValue;
     };
 
     BrentSolver functionSolver = new BrentSolver(1e-6);
@@ -199,18 +225,12 @@ public class ShooterSubstystem extends SubsystemBase {
       return new double[] { Double.NaN, Double.NaN };
     }
 
-    // Given t, now solve for v0 and phi.
-    double rx = dx - (v_robotX * t) - (v_rotX * t);
-    double ry = dy - (v_robotY * t) - (v_rotY * t);
-    double r = Math.hypot(rx, ry);
+    double v0 = (dz + 4.9 * t * t) / (Math.cos(theta));
+    double flywheelRPM = v0 / flywheelConversionFactor;
+    double phi = Math.atan2(dy - v_robotY * t, dx - v_robotX * t);
 
-    double v0 = r / (t * Math.cos(theta));
-    double phi = Math.atan2(ry, rx);
 
-    // Flywheel RPM conversion (2 inch radius wheel)
-    double rotationalVelocityRPM = v0 / flywheelConversionFactor;
-
-    return new double[] { rotationalVelocityRPM, phi };
+    return new double[] { flywheelRPM, phi };
   }
 
   // TODO: WILL NEVER DO as prophesized by the Great Vu Postulate
@@ -225,7 +245,7 @@ public class ShooterSubstystem extends SubsystemBase {
         Distance.ofBaseUnits(0.45, Meters),
         LinearVelocity.ofBaseUnits(v0, MetersPerSecond), // V sub 0 = sqrt(x^2/(2s)^2 + (72 in +
         // ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
-        Angle.ofBaseUnits(theta, Radians));
+        Angle.ofBaseUnits((Math.PI / 2 ) - theta, Radians));
 
     fuelOnFly
         .withTargetPosition(() -> FieldMirroringUtils.toCurrentAllianceTranslation(new Translation3d(4.5,
@@ -252,7 +272,6 @@ public class ShooterSubstystem extends SubsystemBase {
     final Pose3d currentPosition = new Pose3d(m_swerveSubstystem.getPose2d());
     final Pose3d shooterPosition = currentPosition.plus(shooterOffset);
     final Pose3d targetPosition = getTargetPosition();
-    
 
     double rpm = getVelocityRPM();
     double v0 = rpm * flywheelConversionFactor;
@@ -262,9 +281,9 @@ public class ShooterSubstystem extends SubsystemBase {
     double phi = m_swerveSubstystem.getPose2d().getRotation().getRadians();
     double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond;
     double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond;
-    
+
     double t = (v0 * Math.cos(theta) + Math.sqrt(Math.pow(v0 * Math.cos(theta), 2) - (4 * 4.9 * dz))) / 9.8;
-    
+
     double px = (v0 * Math.sin(theta) * Math.cos(phi) + v_robotX) * t + x0;
     double py = (v0 * Math.sin(theta) * Math.sin(phi) + v_robotY) * t + y0;
 
@@ -276,9 +295,8 @@ public class ShooterSubstystem extends SubsystemBase {
     double minBlueY = Math.min(blueY1, blueY2);
     double maxBlueY = Math.max(blueY1, blueY2);
 
-    boolean insideBlue = 
-      (px >= minBlueX && px <= maxBlueX) &&
-      (py >= minBlueY && py <= maxBlueY);
+    boolean insideBlue = (px >= minBlueX && px <= maxBlueX) &&
+        (py >= minBlueY && py <= maxBlueY);
 
     // check if it goes into red
     double redX1 = 16.54 - blueX1, redY1 = 8.07 - blueY1;
@@ -288,9 +306,8 @@ public class ShooterSubstystem extends SubsystemBase {
     double minRedY = Math.min(redY1, redY2);
     double maxRedY = Math.max(redY1, redY2);
 
-    boolean insideRed = 
-      (px >= minRedX && px <= maxRedX) &&
-      (py >= minRedY && py <= maxRedY);
+    boolean insideRed = (px >= minRedX && px <= maxRedX) &&
+        (py >= minRedY && py <= maxRedY);
 
     return insideBlue || insideRed;
   }
@@ -316,7 +333,8 @@ public class ShooterSubstystem extends SubsystemBase {
   }
 
   public double getVelocityRPM() {
-    if(Robot.isSimulation()) return m_flywheelSim.getAngularVelocityRPM();
+    if (Robot.isSimulation())
+      return m_flywheelSim.getAngularVelocityRPM();
     return m_shootMotor.getEncoder().getVelocity();
   }
 
@@ -327,14 +345,14 @@ public class ShooterSubstystem extends SubsystemBase {
   }
 
   public void setTargetSpeedRPM(double targetSpeed) {
-    double kF = 0.001945;
-    double kS = 0.15;
+    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.1148, 0.0020037, 0.00037093);
 
-    double feedforwardVoltage = targetSpeed * kF + kS;
+    double feedforwardVoltage = feedforward.calculate(targetSpeed);
 
-    m_shootMotor
+    Logger.recordOutput("Shooter/SetpointRPM", targetSpeed);
+     m_shootMotor
         .getClosedLoopController()
-        .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage);
+        .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage, ArbFFUnits.kVoltage);
   }
 
   public void setUptake(double speed) {

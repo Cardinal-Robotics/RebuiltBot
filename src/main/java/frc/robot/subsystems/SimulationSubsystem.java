@@ -33,11 +33,12 @@ public class SimulationSubsystem extends SubsystemBase {
   protected static Translation2d redDepotBottomRightCorner = new Translation2d(16.0274, 1.646936);
 
   public SimulationSubsystem() {
-    if (!Robot.isSimulation())
-      return;
+    //if (!Robot.isSimulation()) return;
+
 
     m_arena = SimulatedArena.getInstance();
     m_arena.placeGamePiecesOnField();
+    resetField();
     SmartDashboard.putNumber("x", 0);
     SmartDashboard.putNumber("y", 0);
     SmartDashboard.putNumber("z", 0);
