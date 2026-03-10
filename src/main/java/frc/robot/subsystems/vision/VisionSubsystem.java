@@ -43,7 +43,7 @@ public class VisionSubsystem extends SubsystemBase {
     this.visionSim = new VisionSystemSim("main");
     this.visionSim.addAprilTags(tagLayout);
 
-    leftCamera = new Camera("leftCamera",
+    leftCamera = new Camera("Left",
         this.visionSim,
         new Transform3d(
             new Translation3d(
@@ -51,11 +51,11 @@ public class VisionSubsystem extends SubsystemBase {
               Meters.fromBaseUnits(0.22033),
               Meters.fromBaseUnits(0.15914)
             ),
-            new Rotation3d()),
+            new Rotation3d(0, Math.toRadians(66.602095), 0)),
         VecBuilder.fill(4, 4, 8),
         VecBuilder.fill(0.5, 0.5, 1));
 
-    rightCamera = new Camera("rightCamera",
+    rightCamera = new Camera("Right",
         this.visionSim,
         new Transform3d(
             new Translation3d(
@@ -63,7 +63,7 @@ public class VisionSubsystem extends SubsystemBase {
               Meters.fromBaseUnits(-0.22033),
               Meters.fromBaseUnits(0.15914)
             ),
-            new Rotation3d()),
+            new Rotation3d(0, Math.toRadians(45.0), 0)),
         VecBuilder.fill(4, 4, 8),
         VecBuilder.fill(0.5, 0.5, 1));
   }

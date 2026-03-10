@@ -52,7 +52,7 @@ public class Shoot extends Command {
       m_indexerSubstystem.stopIndexer();
     }
 
-   /*  if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_startTime) > 0.1) { // "units are a man's worst enemy" -
+    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_startTime) > 0.1) { // "units are a man's worst enemy" -
                                                                                   // Charlie Malerich 1/26/2026
       m_startTime = Timer.getFPGATimestamp();
 
@@ -71,7 +71,7 @@ public class Shoot extends Command {
 
       m_shooterSubstystem.setTargetSpeedRPM(RPM);
       this.m_shooterSubstystem.createSimulatedFuelProjectile(); // shoot ball
-    } */
+    }
   }
 
   // Called once the command ends or is interrupted.

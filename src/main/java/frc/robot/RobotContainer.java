@@ -64,22 +64,26 @@ public class RobotContainer {
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
             () -> m_driverController.getLeftY() * -1
                     * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1 : -1)
+                    * (Robot.isSimulation() ? -1 : 1)
                     * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1),
-            () -> m_driverController.getLeftX() * -1
+                    () -> m_driverController.getLeftX() * -1
                     * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1 : -1)
+                    * (Robot.isSimulation() ? -1 : 1)
                     * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1))
-            .deadband(OperatorConstants.kDEADBAND)
-            .scaleTranslation(0.8)
-            .allianceRelativeControl(false);
-
-    SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
-            .headingWhile(true)
-            .withControllerHeadingAxis(
-                    () -> m_driverController.getRightX()
+                    .deadband(OperatorConstants.kDEADBAND)
+                    .scaleTranslation(0.8)
+                    .allianceRelativeControl(false);
+                    
+                    SwerveInputStream driveDirectAngle = driveAngularVelocity.copy()
+                    .headingWhile(true)
+                    .withControllerHeadingAxis(
+                            () -> m_driverController.getRightX()
                             * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1 : -1)
+                            * (Robot.isSimulation() ? -1 : 1)
                             * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1),
-                    () -> m_driverController.getRightY()
+                            () -> m_driverController.getRightY()
                             * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1 : -1)
+                            * (Robot.isSimulation() ? -1 : 1)
                             * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1));
 
     SwerveInputStream driveRobotOriented = driveAngularVelocity.copy().robotRelative(true)
@@ -106,7 +110,7 @@ public class RobotContainer {
     Command riseCommand = m_climberSubsystem.riseCommand();
     Command descendCommand = m_climberSubsystem.descendCommand();
     Command indexerCommand = m_indexerSubsystem.spinIndexerCommand();
-    Command intakeCommand = m_intakeSubsystem.runIntakeMotor(0.55); //temporary (vu postulate)
+    Command intakeCommand = m_intakeSubsystem.runIntakeMotor(1); //temporary (vu postulate)
     Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
 
     // -----------------------------------------------------------------------------------
@@ -127,9 +131,9 @@ public class RobotContainer {
          * }));
          */
 
-        // m_driverController.x().toggleOnTrue(driveRobotOrientedHubLocked);
-        // m_driverController.y().toggleOnTrue(driveAutoAlign);
-        // m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button -
+        m_driverController.x().toggleOnTrue(driveRobotOrientedHubLocked);
+        m_driverController.y().toggleOnTrue(driveAutoAlign);
+        m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button -
         // great vu postulate
         m_driverController.y().whileTrue(m_swerveSubsystem.resetGyroCommand());
         m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));

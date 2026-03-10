@@ -6,10 +6,10 @@ package frc.robot;
 
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import org.littletonrobotics.urcl.URCL;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -23,6 +23,7 @@ public class Robot extends LoggedRobot {
 
   public Robot() {
     Logger.recordMetadata("Rebuilt", "UnnamedBot"); // Set a metadata value
+    PortForwarder.add(5800, "photonvision.local", 5800);
 
     // if (Robot.isSimulation())
     Logger.addDataReceiver(new NT4Publisher());
@@ -108,5 +109,6 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     CommandScheduler.getInstance().run();
+    SimulatedArena.getInstance().simulationPeriodic();
   }
 }

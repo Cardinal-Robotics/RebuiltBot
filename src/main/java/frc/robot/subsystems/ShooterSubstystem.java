@@ -130,17 +130,17 @@ public class ShooterSubstystem extends SubsystemBase {
 
     }
 
-    //setTargetSpeedRPM(SmartDashboard.getNumber("RPM", flywheelConversionFactor));
-
-    // This method will be called once per scheduler run
-
-    
     double[] values = getIdealShooterConditions();
     if (Double.isNaN(values[0]))
     return;
-    
-    setTargetSpeedRPM(values[0]);
-    
+
+    if (!Robot.isSimulation()) setTargetSpeedRPM(values[0]);
+    else setTargetSpeedRPM(SmartDashboard.getNumber("RPM", flywheelConversionFactor));
+
+
+    // This method will be called once per scheduler run
+
+        
 /* 
     Logger.recordOutput(
         "Shooter/SetpointRPM",

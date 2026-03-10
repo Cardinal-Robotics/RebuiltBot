@@ -67,15 +67,15 @@ public class SwerveSubsystem extends SubsystemBase {
       throw new RuntimeException(e);
     }
 
-    Pose2d kInitialRedRobotPose = new Pose2d(12.95, 0.6, Rotation2d.kZero);
+    //Pose2d kInitialRedRobotPose = new Pose2d(12.95, 0.6, Rotation2d.kZero);
 
     SmartDashboard.putData("Field", m_swerveDrive.field);
-    m_swerveDrive.resetOdometry(kInitialRedRobotPose);
+    //m_swerveDrive.resetOdometry(kInitialRedRobotPose);
 
     m_swerveDrive.setChassisDiscretization(true, 0.02);
     m_swerveDrive.setHeadingCorrection(true);
     
-    m_swerveDrive.getGyro().setOffset(new Rotation3d(Rotation2d.k180deg));
+    //m_swerveDrive.getGyro().setOffset(new Rotation3d(Rotation2d.k180deg));
    
     m_swerveDrive.zeroGyro();
 

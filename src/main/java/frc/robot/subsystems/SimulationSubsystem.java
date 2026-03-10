@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import swervelib.simulation.ironmaple.simulation.gamepieces.GamePiece;
+import swervelib.simulation.ironmaple.simulation.gamepieces.GamePieceOnFieldSimulation;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.Arena2026Rebuilt;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
@@ -25,6 +26,7 @@ import static edu.wpi.first.units.Units.Inches;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class SimulationSubsystem extends SubsystemBase {
   SimulatedArena m_arena;
@@ -33,12 +35,11 @@ public class SimulationSubsystem extends SubsystemBase {
   protected static Translation2d redDepotBottomRightCorner = new Translation2d(16.0274, 1.646936);
 
   public SimulationSubsystem() {
-    //if (!Robot.isSimulation()) return;
-
+    if (!Robot.isSimulation())
+      return;
 
     m_arena = SimulatedArena.getInstance();
     m_arena.placeGamePiecesOnField();
-    resetField();
     SmartDashboard.putNumber("x", 0);
     SmartDashboard.putNumber("y", 0);
     SmartDashboard.putNumber("z", 0);
@@ -52,11 +53,9 @@ public class SimulationSubsystem extends SubsystemBase {
 
     Logger.recordOutput("Tracker", new Pose3d(x, y, z, Rotation3d.kZero));
 
-    m_arena.simulationPeriodic();
-    List<GamePiece> fuelGamePieces = SimulatedArena.getInstance().getGamePiecesByType("Fuel");
-
+    List<GamePiece> fuelGamePieces = SimulatedArena.getInstance().getGamePiecesByType("");
     List<Pose3d> poses = new ArrayList<>();
-
+    
     for (int i = 0; i < fuelGamePieces.size(); i++) {
       poses.add(i, fuelGamePieces.get(i).getPose3d());
     }
