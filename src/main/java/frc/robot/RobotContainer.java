@@ -62,11 +62,11 @@ public class RobotContainer {
     // -----------------------------------------------------------------------------------
 
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
-            () -> m_driverController.getLeftY() * -1
+            () -> m_driverController.getLeftY()
                     * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1 : -1)
                     * (Robot.isSimulation() ? -1 : 1)
                     * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1),
-                    () -> m_driverController.getLeftX() * -1
+                    () -> m_driverController.getLeftX()
                     * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1 : -1)
                     * (Robot.isSimulation() ? -1 : 1)
                     * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1))
@@ -116,8 +116,8 @@ public class RobotContainer {
     // -----------------------------------------------------------------------------------
 
     private void configureBindings() {
-        SmartDashboard.putBoolean("Invert Translaiton", true);
-        SmartDashboard.putBoolean("Invert Rotation", true);
+        SmartDashboard.putBoolean("Invert Translation", false);
+        SmartDashboard.putBoolean("Invert Rotation", false);
         m_swerveSubsystem.setDefaultCommand(driveFieldOritentedDirectAngle);
         // m_swerveSubsystem.setDefaultCommand(driveRobotOrientedAngularVelocity);
 

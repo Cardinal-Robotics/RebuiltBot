@@ -31,14 +31,14 @@ public class VisionSubsystem extends SubsystemBase {
   public VisionSubsystem(SwerveSubsystem swerveSubsystem) {
     this.m_swerveSubsystem = swerveSubsystem;
 
-    // try {
-    //   File tagLayoutJSON = new File(Filesystem.getDeployDirectory(), "");
-    //   this.tagLayout = AprilTagFieldLayout.loadFromResource(tagLayoutJSON.getAbsolutePath() + "/field_map_mar_05_16_23_25.json");
-    // } catch (Exception e) {
-      //   throw new RuntimeException(e);
-      // }
+    try {
+      File tagLayoutJSON = new File(Filesystem.getDeployDirectory(), "practicefield.json");
+      this.tagLayout = new AprilTagFieldLayout(tagLayoutJSON.toPath());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
 
-      this.tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    //this.tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
     this.visionSim = new VisionSystemSim("main");
     this.visionSim.addAprilTags(tagLayout);
@@ -74,15 +74,15 @@ public class VisionSubsystem extends SubsystemBase {
     visionSim.update(m_swerveSubsystem.getSwerveDrive().getSimulationDriveTrainPose().get());
 
     // Processes the latest vision data and updates the camera's pose estimation.
-    this.leftCamera.update();
+    //this.leftCamera.update();
     this.rightCamera.update();
 
     // If we have a pose estimate from a camera, give it to YAGSL to do vision +
     // wheel movement odometry.
     Optional<EstimatedRobotPose> rightPoseEstimate = rightCamera.getEstimatedPose();
-    Optional<EstimatedRobotPose> leftPoseEstimate = leftCamera.getEstimatedPose();
+    //Optional<EstimatedRobotPose> leftPoseEstimate = leftCamera.getEstimatedPose();
     this.consumePoseEstimate(rightPoseEstimate);
-    this.consumePoseEstimate(leftPoseEstimate);
+    //this.consumePoseEstimate(leftPoseEstimate);
   }
 
   public void consumePoseEstimate(Optional<EstimatedRobotPose> poseEstimate) {
@@ -90,7 +90,7 @@ public class VisionSubsystem extends SubsystemBase {
       return;
 
     EstimatedRobotPose pose = poseEstimate.get();
-    this.m_swerveSubsystem.addVisionMeasurement(pose, leftCamera.curStdDevs);
+    this.m_swerveSubsystem.addVisionMeasurement(pose, rightCamera.curStdDevs);
   }
 
   public Optional<PhotonPipelineResult> getBestResult() {

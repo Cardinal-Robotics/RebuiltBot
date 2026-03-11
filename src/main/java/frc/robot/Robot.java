@@ -6,6 +6,7 @@ package frc.robot;
 
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.littletonrobotics.urcl.URCL;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 
@@ -32,8 +33,8 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     // If publishing to NetworkTables and DataLog
-    //DataLogManager.start();
-    //URCL.start();
+    DataLogManager.start();
+    URCL.start();
 
     m_robotContainer = new RobotContainer();
   }

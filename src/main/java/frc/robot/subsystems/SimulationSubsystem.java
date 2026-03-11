@@ -46,12 +46,22 @@ public class SimulationSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void simulationPeriodic() {
+  public void periodic() {
     double x = SmartDashboard.getNumber("x", 0);
     double y = SmartDashboard.getNumber("y", 0);
     double z = SmartDashboard.getNumber("z", 0);
 
     Logger.recordOutput("Tracker", new Pose3d(x, y, z, Rotation3d.kZero));
+  }
+
+
+  @Override
+  public void simulationPeriodic() {
+/*     double x = SmartDashboard.getNumber("x", 0);
+    double y = SmartDashboard.getNumber("y", 0);
+    double z = SmartDashboard.getNumber("z", 0);
+
+    Logger.recordOutput("Tracker", new Pose3d(x, y, z, Rotation3d.kZero)); */
 
     List<GamePiece> fuelGamePieces = SimulatedArena.getInstance().getGamePiecesByType("");
     List<Pose3d> poses = new ArrayList<>();

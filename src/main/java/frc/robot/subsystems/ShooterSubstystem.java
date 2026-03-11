@@ -73,7 +73,7 @@ public class ShooterSubstystem extends SubsystemBase {
   private final double theta = Math.toRadians(10);
   private final double wheelRadiusMeters = Meters.convertFrom(2, Inches);
   private final double flywheelConversionFactor = (2 * Math.PI * wheelRadiusMeters) / 60.0;
-  private final Transform3d shooterOffset = new Transform3d(0, 0, 0.45, Rotation3d.kZero);
+  private final Transform3d shooterOffset = new Transform3d(0.140, 0.145, 0.419, Rotation3d.kZero);
 
   private SysIdRoutine routine = new SysIdRoutine(
       new SysIdRoutine.Config(),
@@ -121,6 +121,7 @@ public class ShooterSubstystem extends SubsystemBase {
     // SmartDashboard.putNumber("RPM", 4630);
     SmartDashboard.putNumber("RPM", 0);
     SmartDashboard.putNumber("kF", 0);
+    SmartDashboard.putNumber("kMultipier", 0);
   }
 
   @Override
@@ -134,8 +135,8 @@ public class ShooterSubstystem extends SubsystemBase {
     if (Double.isNaN(values[0]))
     return;
 
-    if (!Robot.isSimulation()) setTargetSpeedRPM(values[0]);
-    else setTargetSpeedRPM(SmartDashboard.getNumber("RPM", flywheelConversionFactor));
+    double targetRPM = values[0] * SmartDashboard.getNumber("kMultipier", 0);
+    setTargetSpeedRPM(targetRPM);
 
 
     // This method will be called once per scheduler run
@@ -156,12 +157,18 @@ public class ShooterSubstystem extends SubsystemBase {
 
   private Pose3d getTargetPosition() {
     Pose3d targetPosition = new Pose3d(
-        4.5,
-        4.03,
+        4.59,
+        4.06,
         Meters.convertFrom(72 + 5, Inches),
         Rotation3d.kZero);
-    if (FieldMirroringUtils.isSidePresentedAsRed())
-      targetPosition = FieldMirroringUtils.flip(targetPosition);
+    if (FieldMirroringUtils.isSidePresentedAsRed()) {
+      targetPosition = new Pose3d(
+        11.95,
+        4.06,
+        Meters.convertFrom(72 + 5, Inches),
+        Rotation3d.kZero
+      );
+    }
 
     return targetPosition;
   }
