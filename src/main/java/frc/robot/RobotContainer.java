@@ -64,11 +64,11 @@ public class RobotContainer {
     SwerveInputStream driveAngularVelocity = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
             () -> m_driverController.getLeftY()
                     * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1 : -1)
-                    * (Robot.isSimulation() ? -1 : 1)
+                    * (Robot.isSimulation() ? 1 : -1)
                     * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1),
                     () -> m_driverController.getLeftX()
                     * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1 : -1)
-                    * (Robot.isSimulation() ? -1 : 1)
+                    * (Robot.isSimulation() ? 1 : -1)
                     * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1))
                     .deadband(OperatorConstants.kDEADBAND)
                     .scaleTranslation(0.8)

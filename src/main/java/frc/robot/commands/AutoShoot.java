@@ -48,48 +48,22 @@ public class AutoShoot extends Command {
 
   @Override
   public void execute() {
-    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_fakeStartTime) > 0.1 && m_intakeSubstystem.obtainGamePieceFromIntake()) { // "units are a man's worst enemy" - Charlie Malerich 1/26/2026
+    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_fakeStartTime) > 0.1) { // "units are a man's worst enemy" - Charlie Malerich 1/26/2026
       m_fakeStartTime = Timer.getFPGATimestamp();
 
-      double theta = Math.toRadians(65); // FIXED SHOOTER ANGLE
-
       double[] conditions = m_shooterSubstystem.getIdealShooterConditions();
-      double w0 = conditions[0];
+      double RPM = conditions[0];
       double phi = conditions[1];
 
-      if (Double.isNaN(w0) || Double.isNaN(phi))
+      if (Double.isNaN(RPM) || Double.isNaN(phi))
         return;
 
-      Logger.recordOutput("Shooter/v0", w0);
+      // Only shoot if we can actually make it and if we have the ammo for it.
+      if (!m_intakeSubstystem.obtainGamePieceFromIntake())
+        return;
 
-      m_shooterSubstystem.setTargetSpeedRPM(w0);
-
-      // 0.2x, 0.45y
-      RebuiltFuelOnFly fuelOnFly = new RebuiltFuelOnFly(
-          m_swerveSubstystem.getPose2d().getTranslation(),
-          new Translation2d(0, 0),
-          m_swerveSubstystem.getFieldVelocity(),
-          m_swerveSubstystem.getPose2d().getRotation(),
-          Distance.ofBaseUnits(0.45, Meters),
-          LinearVelocity.ofBaseUnits(
-              m_shooterSubstystem.getVelocityRPM() * (2 * Math.PI * Meters.convertFrom(2, Inches)) / 60,
-              MetersPerSecond), // V sub 0 = sqrt(x^2/(2s)^2 + (72 in +
-          // ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
-          Angle.ofBaseUnits(theta, Radians));
-
-      fuelOnFly
-          // Configure callbacks to visualize the flight trajectory of the projectile
-          .withProjectileTrajectoryDisplayCallBack(
-              // Callback for when the note will eventually hit the target (if configured)
-              (pose3ds) -> Logger.recordOutput("Flywheel/FuelProjectileSuccessfulShot", pose3ds.toArray(Pose3d[]::new)),
-              // Callback for when the note will eventually miss the target, or if no target
-              // is configured
-              (pose3ds) -> Logger.recordOutput("Flywheel/FuelProjectileUnsuccessfulShot",
-                  pose3ds.toArray(Pose3d[]::new)));
-
-      fuelOnFly.enableBecomesGamePieceOnFieldAfterTouchGround();
-
-      SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
+      m_shooterSubstystem.setTargetSpeedRPM(RPM);
+      this.m_shooterSubstystem.createSimulatedFuelProjectile(); // shoot ball
     }
   }
 

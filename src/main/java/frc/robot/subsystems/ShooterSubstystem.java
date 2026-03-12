@@ -121,7 +121,7 @@ public class ShooterSubstystem extends SubsystemBase {
     // SmartDashboard.putNumber("RPM", 4630);
     SmartDashboard.putNumber("RPM", 0);
     SmartDashboard.putNumber("kF", 0);
-    SmartDashboard.putNumber("kMultipier", 0);
+    SmartDashboard.putNumber("kMultipier", 1.15);
   }
 
   @Override
@@ -136,6 +136,10 @@ public class ShooterSubstystem extends SubsystemBase {
     return;
 
     double targetRPM = values[0] * SmartDashboard.getNumber("kMultipier", 0);
+    if(Robot.isSimulation()) {
+      targetRPM = values[0];
+    }
+    
     setTargetSpeedRPM(targetRPM);
 
 
@@ -208,16 +212,16 @@ public class ShooterSubstystem extends SubsystemBase {
     UnivariateFunction f = t -> {
       double phi = Math.atan2(dy - v_robotY * t, dx - v_robotX * t);
       
-      double v_ySolution = (dy - v_robotY * t) / (Math.sin(theta) * Math.sin(phi));
+      double v_ySolution = (dy - v_robotY * t) / (Math.sin(theta) * Math.sin(phi) * t);
       double interceptValue = v_ySolution;
 
       // If dy - v_robotY = 0 for some reason, it will be NaN because it has already reached the optimal target location on the y-axis. Instead focus on the x-axis.
       if(Double.isNaN(v_ySolution)) {
-        double v_xSolution = (dx - v_robotX * t) / (Math.sin(theta) * Math.cos(phi));
+        double v_xSolution = (dx - v_robotX * t) / (Math.sin(theta) * Math.cos(phi) * t);
         interceptValue = v_xSolution;
       }
 
-      double v_zSolution = (dz + 4.9 * t * t) / (Math.cos(theta));
+      double v_zSolution = (dz + 4.9 * t * t) / (Math.cos(theta) * t);
 
       return v_zSolution - interceptValue;
     };
@@ -232,7 +236,7 @@ public class ShooterSubstystem extends SubsystemBase {
       return new double[] { Double.NaN, Double.NaN };
     }
 
-    double v0 = (dz + 4.9 * t * t) / (Math.cos(theta));
+    double v0 = (dz + 4.9 * t * t) / (Math.cos(theta) * t);
     double flywheelRPM = v0 / flywheelConversionFactor;
     double phi = Math.atan2(dy - v_robotY * t, dx - v_robotX * t);
 
@@ -244,15 +248,16 @@ public class ShooterSubstystem extends SubsystemBase {
   // ERM ACTUALLY
   public void createSimulatedFuelProjectile() {
     double v0 = getVelocityRPM() * flywheelConversionFactor;
+    Logger.recordOutput("Shooter/simVelocity", v0);
     RebuiltFuelOnFly fuelOnFly = new RebuiltFuelOnFly(
         m_swerveSubstystem.getPose2d().getTranslation(),
-        new Translation2d(0, 0),
+        new Translation2d(shooterOffset.getX(), shooterOffset.getY()),
         m_swerveSubstystem.getFieldVelocity(),
         m_swerveSubstystem.getPose2d().getRotation(),
-        Distance.ofBaseUnits(0.45, Meters),
+        Distance.ofBaseUnits(shooterOffset.getZ(), Meters),
         LinearVelocity.ofBaseUnits(v0, MetersPerSecond), // V sub 0 = sqrt(x^2/(2s)^2 + (72 in +
         // ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
-        Angle.ofBaseUnits((Math.PI / 2 ) - theta, Radians));
+        Angle.ofBaseUnits((Math.PI / 2) - theta, Radians));
 
     fuelOnFly
         .withTargetPosition(() -> FieldMirroringUtils.toCurrentAllianceTranslation(new Translation3d(4.5,
