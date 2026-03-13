@@ -64,8 +64,6 @@ public class Shoot extends Command {
         return;
 
       // Only shoot if we can actually make it and if we have the ammo for it.
-      if (m_shooterSubstystem.isValidShot())
-        return;
       if (!m_intakeSubstystem.obtainGamePieceFromIntake())
         return;
 

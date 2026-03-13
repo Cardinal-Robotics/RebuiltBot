@@ -3,26 +3,10 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.625021397994833,
-        "y": 7.379643366619454
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 2.994425253033295,
-        "y": 7.379643366619454
-      },
-      "isLocked": false,
-      "linkedName": "DepotStart"
-    },
-    {
-      "anchor": {
         "x": 0.475,
         "y": 7.38
       },
-      "prevControl": {
-        "x": 0.475,
-        "y": 7.6768700888126284
-      },
+      "prevControl": null,
       "nextControl": {
         "x": 0.4750000000000001,
         "y": 6.011067858947471
@@ -62,19 +46,19 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.9275053304904048,
+      "waypointRelativePos": 0.07675906183369025,
       "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 1.9829424307036212,
+      "waypointRelativePos": 0.9829424307036212,
       "rotationDegrees": 90.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.0209318028359151,
-      "maxWaypointRelativePos": 1.8798109385550177,
+      "minWaypointRelativePos": 0.020931802835915114,
+      "maxWaypointRelativePos": 0.8798109385550177,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 3.0,
@@ -89,7 +73,7 @@
   "eventMarkers": [
     {
       "name": "Intake Start",
-      "waypointRelativePos": 1.9,
+      "waypointRelativePos": 0.8999999999999999,
       "endWaypointRelativePos": null,
       "command": null
     }
@@ -110,7 +94,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 89.22806420814972
   },
   "useDefaultConstraints": false
 }

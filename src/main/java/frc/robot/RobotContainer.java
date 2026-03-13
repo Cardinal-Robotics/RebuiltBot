@@ -24,6 +24,7 @@ import frc.robot.commands.AutoShoot;
 import frc.robot.commands.ClimberDescend;
 import frc.robot.commands.ClimberRise;
 import frc.robot.commands.HubLock;
+import frc.robot.commands.ParallelHubLock;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.ShooterAlign;
 import frc.robot.subsystems.ClimberSubsystem;
@@ -70,12 +71,14 @@ public class RobotContainer {
                                         * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1
                                                         : -1)
                                         * (Robot.isSimulation() ? 1 : -1)
-                                        * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1),
+                                        * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1)
+                                        * (DriverStation.isAutonomous() ? 0 : 1),
                         () -> m_driverController.getLeftX() * -1
                                         * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1
                                                         : -1)
                                         * (Robot.isSimulation() ? 1 : -1)
-                                        * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1))
+                                        * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1)
+                                        * (DriverStation.isAutonomous() ? 0 : 1))
                         .deadband(OperatorConstants.kDEADBAND)
                         .scaleTranslation(0.8)
                         .allianceRelativeControl(false);
@@ -87,22 +90,24 @@ public class RobotContainer {
                                                         * (DriverStation.getAlliance().orElse(Alliance.Red)
                                                                         .equals(Alliance.Blue) ? 1 : -1)
                                                         * (Robot.isSimulation() ? -1 : 1)
-                                                        * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1
-                                                                        : 1),
+                                                        * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1)
+                                                        * (DriverStation.isAutonomous() ? 0 : 1),
                                         () -> m_driverController.getRightY()
                                                         * (DriverStation.getAlliance().orElse(Alliance.Red)
                                                                         .equals(Alliance.Blue) ? 1 : -1)
                                                         * (Robot.isSimulation() ? -1 : 1)
-                                                        * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1
-                                                                        : 1));
+                                                        * (SmartDashboard.getBoolean("Invert Rotation", false) ? -1 : 1)
+                                                        * (DriverStation.isAutonomous() ? 0 : 1));
 
         SwerveInputStream driveRobotOriented = SwerveInputStream.of(m_swerveSubsystem.getSwerveDrive(),
                         () -> m_driverController.getLeftY()
                                         * (Robot.isSimulation() ? 1 : -1)
-                                        * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1),
+                                        * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1)
+                                        * (DriverStation.isAutonomous() ? 0 : 1),
                         () -> m_driverController.getLeftX()
                                         * (Robot.isSimulation() ? 1 : -1)
-                                        * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1))
+                                        * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1)
+                                        * (DriverStation.isAutonomous() ? 0 : 1))
                         .robotRelative(true)
                         .deadband(OperatorConstants.kDEADBAND)
                         .scaleTranslation(0.8)
@@ -122,13 +127,14 @@ public class RobotContainer {
 
         Command driveRobotOrientedHubLocked = new HubLock(m_swerveSubsystem, m_shooterSubsystem, m_driverController);
         Command autoHubLock = new AutoHubLock(m_swerveSubsystem, m_shooterSubsystem, m_driverController);
+        ParallelHubLock parallelHubLock = new ParallelHubLock(m_shooterSubsystem, m_swerveSubsystem);
         Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
         Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_shooterSubsystem);
         Command shootyBoi = new Shoot(m_shooterSubsystem, m_intakeSubsystem, m_indexerSubsystem);
         Command riseCommand = new ClimberRise(m_climberSubsystem, 1.5);
         Command descendCommand = new ClimberDescend(m_climberSubsystem, 1.5);
         Command indexerCommand = m_indexerSubsystem.spinIndexerCommand();
-        Command intakeCommand = m_intakeSubsystem.runIntakeMotor(1); // temporary (vu postulate)
+        Command intakeCommand = m_intakeSubsystem.runIntakeMotor(.5); // temporary (vu postulate)
         Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
 
         // -----------------------------------------------------------------------------------
@@ -149,19 +155,18 @@ public class RobotContainer {
                                 }));
 
                 m_driverController.x().toggleOnTrue(driveRobotOrientedHubLocked);
-                m_driverController.y().toggleOnTrue(driveAutoAlign);
                 m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button -
                 // great vu postulate
                 m_driverController.y().whileTrue(m_swerveSubsystem.resetGyroCommand());
                 m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
                 m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));
-                m_driverController.povUp().whileTrue(descendCommand);
-                m_driverController.povDown().whileTrue(riseCommand);
+                m_driverController.povUp().whileTrue(riseCommand);
+                m_driverController.povDown().whileTrue(descendCommand);
 
                 m_driverController.rightTrigger().whileTrue(shootyBoi);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileTrue(intakeCommand);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileFalse(stopIntakeCommand);
-                // m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
+                m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
 
                 NamedCommands.registerCommand("Print",
                                 Commands.print(
@@ -175,6 +180,8 @@ public class RobotContainer {
                 NamedCommands.registerCommand("Climber Rise", riseCommand);
                 NamedCommands.registerCommand("Climber Descend", descendCommand);
                 NamedCommands.registerCommand("Hub Lock", autoHubLock);
+                NamedCommands.registerCommand("Parallel Hub Lock", parallelHubLock);
+                NamedCommands.registerCommand("Stop Hub Lock", parallelHubLock.stop());
                 NamedCommands.registerCommand("Shooter Align", driveShooterAlign);
                 NamedCommands.registerCommand("Stop",
                                 Commands.runOnce(m_swerveSubsystem.getSwerveDrive()::lockPose, m_swerveSubsystem));

@@ -76,7 +76,7 @@ public class ShooterSubstystem extends SubsystemBase {
   private final Transform3d shooterOffset = new Transform3d(0.140, 0.145, 0.419, Rotation3d.kZero);
 
   private SysIdRoutine routine = new SysIdRoutine(
-      new SysIdRoutine.Config(),
+      new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
       new SysIdRoutine.Mechanism(
         (voltage) -> m_shootMotor.setVoltage(voltage.in(Volts)), 
         null,
@@ -91,7 +91,7 @@ public class ShooterSubstystem extends SubsystemBase {
     SparkMaxConfig shootConfig = new SparkMaxConfig();
 
     shootConfig.idleMode(IdleMode.kCoast);
-    shootConfig.closedLoop.pid(0.00019762, 0, 0);
+    shootConfig.closedLoop.pid(0.00034274, 0, 0);
     // shootConfig.closedLoop.allowedClosedLoopError(100, ClosedLoopSlot.kSlot0);
     shootConfig.inverted(true);
     
@@ -119,6 +119,7 @@ public class ShooterSubstystem extends SubsystemBase {
     m_swerveSubstystem = swerveSubsystem;
 
     // SmartDashboard.putNumber("RPM", 4630);
+    SmartDashboard.putNumber("kMultiplier", 1.5);
     SmartDashboard.putNumber("RPM", 0);
     SmartDashboard.putNumber("kF", 0);
   }
@@ -134,7 +135,7 @@ public class ShooterSubstystem extends SubsystemBase {
     if (Double.isNaN(values[0]))
     return;
 
-    double targetRPM = values[0] * 2;
+    double targetRPM = values[0] * 1.8;//SmartDashboard.getNumber("kMultiplier", 1.5);
     if(Robot.isSimulation()) {
       targetRPM = values[0];
     }
@@ -258,9 +259,10 @@ public class ShooterSubstystem extends SubsystemBase {
         // ((0.5)(9.8)((2s)^2))^2)/(2s)^2)
         Angle.ofBaseUnits((Math.PI / 2) - theta, Radians));
 
+    Pose3d targetPosition = getTargetPosition();
+
     fuelOnFly
-        .withTargetPosition(() -> FieldMirroringUtils.toCurrentAllianceTranslation(new Translation3d(4.5,
-            4.03, Meters.convertFrom(72, Inches))))
+        .withTargetPosition(() -> targetPosition.getTranslation())
         .withTargetTolerance(new Translation3d(0.5, 0.5, 0.1));
 
     fuelOnFly
@@ -276,51 +278,6 @@ public class ShooterSubstystem extends SubsystemBase {
     fuelOnFly.enableBecomesGamePieceOnFieldAfterTouchGround();
 
     SimulatedArena.getInstance().addGamePieceProjectile(fuelOnFly);
-  }
-
-  // Not working, Fix later (vu postulate)
-  public boolean isValidShot() {
-    final Pose3d currentPosition = new Pose3d(m_swerveSubstystem.getPose2d());
-    final Pose3d shooterPosition = currentPosition.plus(shooterOffset);
-    final Pose3d targetPosition = getTargetPosition();
-
-    double rpm = getVelocityRPM();
-    double v0 = rpm * flywheelConversionFactor;
-    double x0 = m_swerveSubstystem.getPose2d().getX();
-    double y0 = m_swerveSubstystem.getPose2d().getY();
-    double dz = targetPosition.getZ() - shooterPosition.getZ();
-    double phi = m_swerveSubstystem.getPose2d().getRotation().getRadians();
-    double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond;
-    double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond;
-
-    double t = (v0 * Math.cos(theta) + Math.sqrt(Math.pow(v0 * Math.cos(theta), 2) - (4 * 4.9 * dz))) / 9.8;
-
-    double px = (v0 * Math.sin(theta) * Math.cos(phi) + v_robotX) * t + x0;
-    double py = (v0 * Math.sin(theta) * Math.sin(phi) + v_robotY) * t + y0;
-
-    // Check if blue works.
-    double blueX1 = 4.40, blueY1 = 4.40;
-    double blueX2 = 4.9, blueY2 = 3.75;
-    double minBlueX = Math.min(blueX1, blueX2);
-    double maxBlueX = Math.max(blueX1, blueX2);
-    double minBlueY = Math.min(blueY1, blueY2);
-    double maxBlueY = Math.max(blueY1, blueY2);
-
-    boolean insideBlue = (px >= minBlueX && px <= maxBlueX) &&
-        (py >= minBlueY && py <= maxBlueY);
-
-    // check if it goes into red
-    double redX1 = 16.54 - blueX1, redY1 = 8.07 - blueY1;
-    double redX2 = 16.54 - blueX2, redY2 = 8.07 - blueY2;
-    double minRedX = Math.min(redX1, redX2);
-    double maxRedX = Math.max(redX1, redX2);
-    double minRedY = Math.min(redY1, redY2);
-    double maxRedY = Math.max(redY1, redY2);
-
-    boolean insideRed = (px >= minRedX && px <= maxRedX) &&
-        (py >= minRedY && py <= maxRedY);
-
-    return insideBlue || insideRed;
   }
 
   @Override
@@ -356,7 +313,7 @@ public class ShooterSubstystem extends SubsystemBase {
   }
 
   public void setTargetSpeedRPM(double targetSpeed) {
-    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.1148, 0.0020037, 0.00037093);
+    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.13445, 0.0020244, 0.00062254);
 
     double feedforwardVoltage = feedforward.calculate(targetSpeed);
 

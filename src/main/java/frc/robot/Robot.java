@@ -33,8 +33,8 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     // If publishing to NetworkTables and DataLog
-    DataLogManager.start();
-    URCL.start();
+  Logger.registerURCL(URCL.startExternal());
+  Logger.start();
 
     m_robotContainer = new RobotContainer();
   }

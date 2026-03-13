@@ -22,8 +22,8 @@ public class ClimberSubsystem extends SubsystemBase {
 
 
   public ClimberSubsystem() {
-    m_climberMotorLeft.setInverted(true);
-    m_climberMotorRight.setInverted(true);
+    m_climberMotorLeft.setInverted(false);
+    m_climberMotorRight.setInverted(false);
   }
 
   @Override

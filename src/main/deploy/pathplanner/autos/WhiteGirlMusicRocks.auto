@@ -47,21 +47,9 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Climber Rise"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "CenterClimb"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "Climber Descend"
           }
         }
       ]
