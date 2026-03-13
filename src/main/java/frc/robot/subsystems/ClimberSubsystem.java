@@ -38,16 +38,16 @@ public class ClimberSubsystem extends SubsystemBase {
     m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 1);
   }
 
-  public Command riseCommand() {
-    return run(this::rise);
-  }
+  // public Command riseCommand() {
+  //   return run(this::rise);
+  // }
   
   public void descend () {
     m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, -1);
     m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, -1);
   }
 
-  public Command descendCommand() {
-    return run(this::descend);
-  }
+  // public Command descendCommand() {
+  //   return run(this::descend);
+  // }
 }

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.979166666666668,
+        "y": 7.372
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 2.6303205128205143,
+        "y": 6.314128205128205
+      },
+      "isLocked": false,
+      "linkedName": "MiddleToClimb2"
+    },
+    {
+      "anchor": {
+        "x": 1.9093717948717956,
+        "y": 3.7210384615384617
+      },
+      "prevControl": {
+        "x": 2.2000769230769244,
+        "y": 4.930371794871794
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "ClimbCenter"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": true
+}

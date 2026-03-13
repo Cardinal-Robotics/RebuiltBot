@@ -3,71 +3,71 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.811654778887304,
-        "y": 0.6386019971469341
+        "x": 3.665230769230771,
+        "y": 7.558
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.811654778887302,
-        "y": 0.6386019971469343
-      },
-      "isLocked": false,
-      "linkedName": "EndBalls"
-    },
-    {
-      "anchor": {
-        "x": 8.92987161198288,
-        "y": 1.2702891566265067
-      },
-      "prevControl": {
-        "x": 9.203277362322442,
-        "y": 0.5354353419037777
-      },
-      "nextControl": {
-        "x": 8.652469879518073,
-        "y": 2.0158832820583346
+        "x": 4.665230769230779,
+        "y": 7.558
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 8.663397590361445,
-        "y": 5.838072289156627
+        "x": 7.700217948717951,
+        "y": 7.151358974358974
       },
       "prevControl": {
-        "x": 8.477100385851537,
-        "y": 5.028157049739616
+        "x": 7.644003072043263,
+        "y": 7.39495677328263
       },
       "nextControl": {
-        "x": 8.849694794871352,
-        "y": 6.647987528573639
+        "x": 7.757896443827818,
+        "y": 6.901418828882875
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 2.4455301204819277,
-        "y": 5.838072289156627
+        "x": 5.421089743589744,
+        "y": 0.6977051282051274
       },
       "prevControl": {
-        "x": 2.9767789904267583,
-        "y": 5.06220481927711
+        "x": 8.456051282051282,
+        "y": 0.8953846153846154
+      },
+      "nextControl": {
+        "x": 5.106933725371519,
+        "y": 0.677242858819266
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.979166666666668,
+        "y": 0.6980000000000004
+      },
+      "prevControl": {
+        "x": 3.229166666666668,
+        "y": 0.6980000000000004
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "MiddleToClimb"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.5,
-      "rotationDegrees": 0.0
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 90.0
     },
     {
-      "waypointRelativePos": 1.0,
-      "rotationDegrees": -73.89766109767902
+      "waypointRelativePos": 1.5003287310979636,
+      "rotationDegrees": 119.99999999999999
     }
   ],
   "constraintZones": [],
@@ -82,13 +82,13 @@
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0.0,
-    "rotation": -127.47617956136138
+    "velocity": 0,
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
-    "velocity": 0.0,
+    "velocity": 0,
     "rotation": 0.0
   },
   "useDefaultConstraints": true

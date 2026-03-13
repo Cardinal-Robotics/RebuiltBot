@@ -1,5 +1,7 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Micro;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -19,6 +21,8 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AprilTagAlign;
 import frc.robot.commands.AutoHubLock;
 import frc.robot.commands.AutoShoot;
+import frc.robot.commands.ClimberDescend;
+import frc.robot.commands.ClimberRise;
 import frc.robot.commands.HubLock;
 import frc.robot.commands.Shoot;
 import frc.robot.commands.ShooterAlign;
@@ -107,8 +111,8 @@ public class RobotContainer {
     Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_shooterSubsystem);
     Command shootyBoi = new Shoot(m_shooterSubsystem, m_intakeSubsystem, m_indexerSubsystem);
 
-    Command riseCommand = m_climberSubsystem.riseCommand();
-    Command descendCommand = m_climberSubsystem.descendCommand();
+    Command riseCommand = new ClimberRise(m_climberSubsystem, 1.5);
+    Command descendCommand = new ClimberDescend(m_climberSubsystem, 1.5);
     Command indexerCommand = m_indexerSubsystem.spinIndexerCommand();
     Command intakeCommand = m_intakeSubsystem.runIntakeMotor(1); //temporary (vu postulate)
     Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
