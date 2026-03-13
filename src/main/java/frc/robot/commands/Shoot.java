@@ -45,7 +45,7 @@ public class Shoot extends Command {
   @Override
   public void execute() {
     if(true /* m_shooterSubstystem.atTargetSpeed() */) {
-      m_shooterSubstystem.setUptake(0.6);
+      m_shooterSubstystem.setUptake(0.8);
       m_indexerSubstystem.spinIndexer();
     } else { 
       m_shooterSubstystem.setUptake(0.0);

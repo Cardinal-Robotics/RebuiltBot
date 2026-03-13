@@ -48,25 +48,25 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "Shoot3s"
+                  "name": "Intake Stop"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Climber Rise"
+                  "name": "Shoot3s"
                 }
               },
               {
                 "type": "path",
                 "data": {
-                  "pathName": "LeftLeftClimb"
+                  "pathName": "CenterClimb"
                 }
               },
               {
                 "type": "named",
                 "data": {
-                  "name": "Climber Descend"
+                  "name": "Stop"
                 }
               }
             ]

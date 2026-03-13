@@ -121,7 +121,6 @@ public class ShooterSubstystem extends SubsystemBase {
     // SmartDashboard.putNumber("RPM", 4630);
     SmartDashboard.putNumber("RPM", 0);
     SmartDashboard.putNumber("kF", 0);
-    SmartDashboard.putNumber("kMultipier", 1.15);
   }
 
   @Override
@@ -135,7 +134,7 @@ public class ShooterSubstystem extends SubsystemBase {
     if (Double.isNaN(values[0]))
     return;
 
-    double targetRPM = values[0] * SmartDashboard.getNumber("kMultipier", 0);
+    double targetRPM = values[0] * 2;
     if(Robot.isSimulation()) {
       targetRPM = values[0];
     }

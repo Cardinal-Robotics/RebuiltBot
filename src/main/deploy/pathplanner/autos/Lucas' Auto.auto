@@ -13,13 +13,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Shooter Align"
+            "name": "Hub Lock"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Shoot3s"
           }
         }
       ]

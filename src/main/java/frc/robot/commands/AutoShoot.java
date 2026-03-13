@@ -22,16 +22,17 @@ import frc.robot.subsystems.*;
 
 public class AutoShoot extends Command {
   private ShooterSubstystem m_shooterSubstystem;
-  private SwerveSubsystem m_swerveSubstystem;
   private IntakeSubsystem m_intakeSubstystem;
+  private IndexerSubsystem m_indexerSubstystem;
   private double m_fakeStartTime;
   private double m_trueStartTime;
   private final double shootTime;
 
-  public AutoShoot(ShooterSubstystem shooterSubstystem, SwerveSubsystem swerveSubsystem, IntakeSubsystem intakeSubsystem, double shootTime) {
+  public AutoShoot(ShooterSubstystem shooterSubstystem, IntakeSubsystem intakeSubsystem, IndexerSubsystem indexer,
+      double shootTime) {
     m_shooterSubstystem = shooterSubstystem;
-    m_swerveSubstystem = swerveSubsystem;
     m_intakeSubstystem = intakeSubsystem;
+    m_indexerSubstystem = indexer;
 
     this.shootTime = shootTime;
 
@@ -40,6 +41,9 @@ public class AutoShoot extends Command {
 
   @Override
   public void initialize() {
+    m_trueStartTime = Timer.getFPGATimestamp();
+
+
     if (Robot.isSimulation()) {
       m_fakeStartTime = Timer.getFPGATimestamp();
       m_trueStartTime = m_fakeStartTime;
@@ -48,7 +52,17 @@ public class AutoShoot extends Command {
 
   @Override
   public void execute() {
-    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_fakeStartTime) > 0.1) { // "units are a man's worst enemy" - Charlie Malerich 1/26/2026
+    Logger.recordOutput("AAAAAAAAAAAAAAAAA", Timer.getFPGATimestamp());
+    if (true /* m_shooterSubstystem.atTargetSpeed() */) {
+      m_shooterSubstystem.setUptake(0.8);
+      m_indexerSubstystem.spinIndexer();
+    } else {
+      m_shooterSubstystem.setUptake(0.0);
+      m_indexerSubstystem.stopIndexer();
+    }
+
+    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_fakeStartTime) > 0.1) { // "units are a man's worst enemy"
+                                                                                      // - Charlie Malerich 1/26/2026
       m_fakeStartTime = Timer.getFPGATimestamp();
 
       double[] conditions = m_shooterSubstystem.getIdealShooterConditions();
@@ -70,11 +84,13 @@ public class AutoShoot extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
+    m_shooterSubstystem.setUptake(0.0);
+    m_indexerSubstystem.stopIndexer();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-      return (Timer.getFPGATimestamp() - m_trueStartTime) > shootTime;
+    return (Timer.getFPGATimestamp() - m_trueStartTime) > shootTime;
   }
 }
