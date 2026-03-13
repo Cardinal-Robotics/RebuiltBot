@@ -32,7 +32,7 @@ public class IndexerSubsystem extends SubsystemBase {
   }
 
   public void spinIndexer() {
-    m_indexerMotor.set(TalonSRXControlMode.PercentOutput, 0.8);
+    m_indexerMotor.set(TalonSRXControlMode.PercentOutput, 1);
   }
 
   public Command spinIndexerCommand() {

@@ -53,7 +53,7 @@ public class AutoShoot extends Command {
   @Override
   public void execute() {
     Logger.recordOutput("AAAAAAAAAAAAAAAAA", Timer.getFPGATimestamp());
-    if (true /* m_shooterSubstystem.atTargetSpeed() */) {
+    if (m_shooterSubstystem.atTargetSpeed()) {
       m_shooterSubstystem.setUptake(0.8);
       m_indexerSubstystem.spinIndexer();
     } else {
