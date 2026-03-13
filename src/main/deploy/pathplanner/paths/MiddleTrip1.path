@@ -1,0 +1,95 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.665230769230771,
+        "y": 7.558
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.665230769230779,
+        "y": 7.558
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.700217948717951,
+        "y": 7.151358974358974
+      },
+      "prevControl": {
+        "x": 7.644003072043263,
+        "y": 7.39495677328263
+      },
+      "nextControl": {
+        "x": 7.757896443827818,
+        "y": 6.901418828882875
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.421089743589744,
+        "y": 0.6977051282051274
+      },
+      "prevControl": {
+        "x": 8.456051282051282,
+        "y": 0.8953846153846154
+      },
+      "nextControl": {
+        "x": 5.106933725371519,
+        "y": 0.677242858819266
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.979166666666668,
+        "y": 0.6980000000000004
+      },
+      "prevControl": {
+        "x": 3.229166666666668,
+        "y": 0.6980000000000004
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "MiddleToClimb"
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1.0,
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 1.5003287310979636,
+      "rotationDegrees": 119.99999999999999
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": null,
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": true
+}
