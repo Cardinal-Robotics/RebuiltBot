@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Micro;
-
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -16,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.AprilTagAlign;
@@ -136,6 +135,9 @@ public class RobotContainer {
         Command indexerCommand = m_indexerSubsystem.spinIndexerCommand();
         Command intakeCommand = m_intakeSubsystem.runIntakeMotor(.5); // temporary (vu postulate)
         Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
+        Command unlockServos = m_climberSubsystem.unlockServos();
+        Command lockServos = m_climberSubsystem.lockServos();
+
 
         // -----------------------------------------------------------------------------------
 
@@ -160,13 +162,18 @@ public class RobotContainer {
                 m_driverController.y().whileTrue(m_swerveSubsystem.resetGyroCommand());
                 m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
                 m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));
-                m_driverController.povUp().whileTrue(riseCommand);
-                m_driverController.povDown().whileTrue(descendCommand);
+                m_driverController.povUp().whileTrue(unlockServos.andThen(new WaitCommand(0.3).andThen(riseCommand)));
+                m_driverController.povDown().whileTrue(lockServos.andThen(new WaitCommand(0.3).andThen(descendCommand)));
 
                 m_driverController.rightTrigger().whileTrue(shootyBoi);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileTrue(intakeCommand);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileFalse(stopIntakeCommand);
                 m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
+
+                unlockServos.setName("Unlock");
+                lockServos.setName("Lock");
+                SmartDashboard.putData(unlockServos);
+                SmartDashboard.putData(lockServos);
 
                 NamedCommands.registerCommand("Print",
                                 Commands.print(

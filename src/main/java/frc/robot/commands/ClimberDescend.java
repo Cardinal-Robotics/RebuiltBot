@@ -36,12 +36,14 @@ public class ClimberDescend extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_climberSubsystem.stop();
+  }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_startTime) > climbTime) return true;
-    else return false;
+    else return m_climberSubsystem.areBottomSwitchesPressed();
   }
 }

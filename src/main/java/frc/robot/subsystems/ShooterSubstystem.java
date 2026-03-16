@@ -319,9 +319,9 @@ public class ShooterSubstystem extends SubsystemBase {
     this.setpoint = targetSpeed;
 
     Logger.recordOutput("Shooter/SetpointRPM", targetSpeed);
-    shootController
-        .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage,
-            ArbFFUnits.kVoltage);
+    // shootController
+    //     .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage,
+    //         ArbFFUnits.kVoltage);
   }
 
   public void setUptake(double speed) {
