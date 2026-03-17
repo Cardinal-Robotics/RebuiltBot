@@ -162,8 +162,8 @@ public class RobotContainer {
                 m_driverController.y().whileTrue(m_swerveSubsystem.resetGyroCommand());
                 m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
                 m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));
-                m_driverController.povUp().whileTrue(unlockServos.andThen(new WaitCommand(0.3).andThen(riseCommand)));
-                m_driverController.povDown().whileTrue(lockServos.andThen(new WaitCommand(0.3).andThen(descendCommand)));
+                m_driverController.povUp().toggleOnTrue(unlockServos.andThen(new WaitCommand(0.3)).andThen(riseCommand));
+                m_driverController.povDown().toggleOnTrue(lockServos.andThen(new WaitCommand(0.3)).andThen(descendCommand));
 
                 m_driverController.rightTrigger().whileTrue(shootyBoi);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileTrue(intakeCommand);// .whileTrue(indexerCommand);

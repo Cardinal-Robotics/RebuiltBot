@@ -21,21 +21,11 @@ public final class Constants {
     }
 
     public static final class DriveConstants {
-        public static final double kMaxSpeed = 2;
-
-        // PID values for translation (moving).
-        public static final double kPTrans = 5;
-        public static final double kITrans = 0;
-        public static final double kDTrans = 0;// 0.35005;
-
-        // PID values for rotating.
-        public static final double kPAngular = 5;
-        public static final double kIAngular = 0;
-        public static final double kDAngular = 0;
+        public static final double kMaxSpeed = 3.5;
 
         public static final PPHolonomicDriveController kPathDriveController = new PPHolonomicDriveController(
                 // Translation PID
-                new PIDConstants(3, 0, 0),
+                new PIDConstants(3, 0, 0), // D 0.35005;
                 // Rotation PID
                 new PIDConstants(5, 0, 0));
     }

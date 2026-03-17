@@ -36,11 +36,11 @@ public class ClimberSubsystem extends SubsystemBase {
   private double lastLeftCurrent = 0;
   public boolean isLeftClimberToppingOut() {
     double current = m_climberMotorLeft.getStatorCurrent();
-    double slope = current - lastLeftCurrent;
+    double slope = (current - lastLeftCurrent) / 0.02;
     lastLeftCurrent = current;
 
     // Find the current threshold the climber at stress uses & find the rate of change.
-    if(current > 55 && slope > 0) {
+    if(slope > 0) {
       leftSpikeTimer.start();
     } else {
       leftSpikeTimer.reset();
@@ -63,7 +63,7 @@ public class ClimberSubsystem extends SubsystemBase {
     lastRightCurrent = current;
 
     // Find the current threshold the climber at stress uses & find the rate of change.
-    if(current > 55 && slope > 0) {
+    if(slope > 0) {
       rightSpikeTimer.start();
     } else {
       rightSpikeTimer.reset();
@@ -80,32 +80,30 @@ public class ClimberSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("BL", m_bottomLimitSwitchLeft.get());
-    SmartDashboard.putBoolean("BR", m_bottomLimitSwitchRight.get());
+    Logger.recordOutput("Climber/BL", m_bottomLimitSwitchLeft.get());
+    Logger.recordOutput("Climber/BR", m_bottomLimitSwitchRight.get());
 
-    Logger.recordOutput("LeftCurrent", m_climberMotorLeft.getStatorCurrent());
-    Logger.recordOutput("RightCurrent", m_climberMotorRight.getStatorCurrent());
+    Logger.recordOutput("Climber/LeftCurrent", m_climberMotorLeft.getStatorCurrent());
+    Logger.recordOutput("Climber/RightCurrent", m_climberMotorRight.getStatorCurrent());
     Logger.recordOutput("Climber/TopOutL", isLeftClimberToppingOut());
     Logger.recordOutput("Climber/TopOutR", isRightClimberToppingOut());
-
-    // This method will be called once per scheduler run you stole
-    if (m_bottomLimitSwitchLeft.get()) {
-      m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 0);
-    }
-
-    if (m_bottomLimitSwitchRight.get()) {
-      m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 0);
-    }
   }
 
   public void rise() { // NO RATCHET ON LEFT
+    // if(!isLeftClimberToppingOut()) { m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 1); }
+    // else { m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 0); }
+    // if(!isRightClimberToppingOut()) { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 1); }
+    // else { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 0); }
+
     m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 1);
     m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 1);
   }
 
   public void descend() {
     if (!m_bottomLimitSwitchLeft.get()) { m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, -1); }
+    else { m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 0); }
     if (!m_bottomLimitSwitchRight.get()) { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, -1); }
+    else { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 0);}
   }
 
   public void stop() { // NO RATCHET ON LEFT
