@@ -69,13 +69,13 @@ public class RobotContainer {
                         () -> m_driverController.getLeftY() * -1
                                         * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1
                                                         : -1)
-                                        * (Robot.isSimulation() ? 1 : -1)
+                                        * (Robot.isSimulation() ? -1 : -1)
                                         * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1)
                                         * (DriverStation.isAutonomous() ? 0 : 1),
                         () -> m_driverController.getLeftX() * -1
                                         * (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Blue) ? 1
                                                         : -1)
-                                        * (Robot.isSimulation() ? 1 : -1)
+                                        * (Robot.isSimulation() ? -1 : -1)
                                         * (SmartDashboard.getBoolean("Invert Translation", false) ? 1 : -1)
                                         * (DriverStation.isAutonomous() ? 0 : 1))
                         .deadband(OperatorConstants.kDEADBAND)

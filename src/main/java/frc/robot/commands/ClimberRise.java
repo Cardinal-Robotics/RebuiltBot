@@ -6,6 +6,8 @@ package frc.robot.commands;
 
 import java.security.Timestamp;
 
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,9 +23,11 @@ public class ClimberRise extends Command {
   public ClimberRise(ClimberSubsystem climberSubsystem, double climbTime) {
     m_climberSubsystem = climberSubsystem;
     this.climbTime = climbTime;
-
+    
     addRequirements(climberSubsystem);
   }
+  
+
 
   // Called when the command is initially scheduled.
   @Override
@@ -47,6 +51,6 @@ public class ClimberRise extends Command {
   @Override
   public boolean isFinished() {
     if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_startTime) > climbTime) return true;
-    else return m_climberSubsystem.areTopSwitchesPressed();
+    else return false;//m_climberSubsystem.isLeftClimberToppingOut() && m_climberSubsystem.isRightClimberToppingOut();
   }
 }

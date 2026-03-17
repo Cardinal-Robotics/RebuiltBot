@@ -28,6 +28,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -191,22 +192,26 @@ public class ShooterSubstystem extends SubsystemBase {
 
   /**
    * @return double[]
-   *         Index 0 is Rotational RPM
+   *         Index 0 is Rotational RPMTho
    *         Index 1 is azimuthal angle
    */
   public double[] getIdealShooterConditions() {
-
-    final double g = 9.8;
+    // I hate MapleSim so much bro. They use 11 as their gravity.
+    final double g = Robot.isSimulation() ? 11 : 9.8;
     final double theta = this.theta;
     final double t_min = 0.5;
     final double t_max = 5;
 
     double[] netTranslation = calculateNetTargetTranslation();
-
     double dx = netTranslation[0], dy = netTranslation[1], dz = netTranslation[2];
-    double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond;
-    double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond;
     double w_robot = m_swerveSubstystem.getFieldVelocity().omegaRadiansPerSecond;
+
+
+    Translation2d offsetField = shooterOffset.getTranslation().toTranslation2d().rotateBy(m_swerveSubstystem.getPose2d().getRotation());
+    Translation2d velocityDueToRotation = offsetField.rotateBy(Rotation2d.kCCW_90deg).times(w_robot);
+
+    double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond + velocityDueToRotation.getX();
+    double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond + velocityDueToRotation.getY();
 
     // Solves for t = 0 using some special technique called the BrentSolver.
     UnivariateFunction f = t -> {
@@ -223,7 +228,7 @@ public class ShooterSubstystem extends SubsystemBase {
         interceptValue = v_xSolution;
       }
 
-      double v_zSolution = (dz + 4.9 * t * t) / (Math.cos(theta) * t);
+      double v_zSolution = (dz + (g / 2) * t * t) / (Math.cos(theta) * t);
 
       return v_zSolution - interceptValue;
     };
@@ -238,7 +243,7 @@ public class ShooterSubstystem extends SubsystemBase {
       return new double[] { Double.NaN, Double.NaN };
     }
 
-    double v0 = (dz + 4.9 * t * t) / (Math.cos(theta) * t);
+    double v0 = (dz + (g / 2) * t * t) / (Math.cos(theta) * t);
     double flywheelRPM = v0 / flywheelConversionFactor;
     double phi = Math.atan2(dy - v_robotY * t, dx - v_robotX * t);
 
@@ -319,9 +324,9 @@ public class ShooterSubstystem extends SubsystemBase {
     this.setpoint = targetSpeed;
 
     Logger.recordOutput("Shooter/SetpointRPM", targetSpeed);
-    // shootController
-    //     .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage,
-    //         ArbFFUnits.kVoltage);
+    shootController
+        .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage,
+            ArbFFUnits.kVoltage);
   }
 
   public void setUptake(double speed) {
