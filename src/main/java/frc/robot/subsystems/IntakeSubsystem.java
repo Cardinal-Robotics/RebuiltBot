@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.ArrayList;
 import java.util.function.Function;
 
 import org.littletonrobotics.junction.Logger;
@@ -29,7 +30,9 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
@@ -50,6 +53,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private SwerveSubsystem m_swerveSubsystem;
 
   private DCMotor m_neoGearbox = DCMotor.getNEO(1);
+  private DutyCycleEncoder absoluteEncoder = new DutyCycleEncoder(0);
 
   private SparkMax m_pivotMotor = new SparkMax(32, MotorType.kBrushless);
   private SparkMaxSim m_pivotMotorSim = new SparkMaxSim(m_pivotMotor, m_neoGearbox);
@@ -75,6 +79,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   /** Creates a new IntakeSubsystem. */
   public IntakeSubsystem(SwerveSubsystem swerveSubsystem) {
+    absoluteEncoder.setDutyCycleRange(0, 360);
     this.m_swerveSubsystem = swerveSubsystem;
 
     SparkMaxConfig pivotConfig = new SparkMaxConfig();
@@ -124,6 +129,8 @@ public class IntakeSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     armLigament.setAngle(m_pivotMotor.getEncoder().getPosition());
+    Logger.recordOutput("Intake/AbsoluteEncoder", absoluteEncoder.get());
+
     SmartDashboard.putData("Arm Sim", mech);
     Logger.recordOutput("Intake/Pivot", m_pivotMotor.getEncoder().getPosition());
 

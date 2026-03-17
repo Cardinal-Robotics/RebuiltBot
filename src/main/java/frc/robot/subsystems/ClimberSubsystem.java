@@ -29,7 +29,7 @@ public class ClimberSubsystem extends SubsystemBase {
   }
 
   public boolean areBottomSwitchesPressed() {
-    return m_bottomLimitSwitchLeft.get() && m_bottomLimitSwitchRight.get();
+    return m_bottomLimitSwitchLeft.get() && !m_bottomLimitSwitchRight.get();
   }
 
   private final Timer leftSpikeTimer = new Timer();
@@ -40,7 +40,7 @@ public class ClimberSubsystem extends SubsystemBase {
     lastLeftCurrent = current;
 
     // Find the current threshold the climber at stress uses & find the rate of change.
-    if(slope > 0) {
+    if(slope > 100) {
       leftSpikeTimer.start();
     } else {
       leftSpikeTimer.reset();
@@ -63,7 +63,7 @@ public class ClimberSubsystem extends SubsystemBase {
     lastRightCurrent = current;
 
     // Find the current threshold the climber at stress uses & find the rate of change.
-    if(slope > 0) {
+    if(slope > 100) {
       rightSpikeTimer.start();
     } else {
       rightSpikeTimer.reset();
@@ -81,7 +81,7 @@ public class ClimberSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     Logger.recordOutput("Climber/BL", m_bottomLimitSwitchLeft.get());
-    Logger.recordOutput("Climber/BR", m_bottomLimitSwitchRight.get());
+    Logger.recordOutput("Climber/BR", !m_bottomLimitSwitchRight.get());
 
     Logger.recordOutput("Climber/LeftCurrent", m_climberMotorLeft.getStatorCurrent());
     Logger.recordOutput("Climber/RightCurrent", m_climberMotorRight.getStatorCurrent());
@@ -95,14 +95,14 @@ public class ClimberSubsystem extends SubsystemBase {
     // if(!isRightClimberToppingOut()) { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 1); }
     // else { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 0); }
 
-    m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 1);
-    m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 1);
+    m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 0.5);
+    m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 0.5);
   }
 
   public void descend() {
-    if (!m_bottomLimitSwitchLeft.get()) { m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, -1); }
+    if (!m_bottomLimitSwitchLeft.get()) { m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, -0.5); }
     else { m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 0); }
-    if (!m_bottomLimitSwitchRight.get()) { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, -1); }
+    if (m_bottomLimitSwitchRight.get()) { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, -0.5); }
     else { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 0);}
   }
 
@@ -115,12 +115,14 @@ public class ClimberSubsystem extends SubsystemBase {
                                   // climbers can go down, not up
     return runOnce(() -> {
       m_rightClimberServo.set(0);
+      m_leftClimberServo.set(0.4);
     });
   }
 
   public Command lockServos() {
     return runOnce(() -> {
       m_rightClimberServo.set(0.4);
+      m_leftClimberServo.set(0);
     });
   }
 

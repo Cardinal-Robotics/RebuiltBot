@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -133,7 +134,7 @@ public class RobotContainer {
         Command riseCommand = new ClimberRise(m_climberSubsystem, 1.5);
         Command descendCommand = new ClimberDescend(m_climberSubsystem, 1.5);
         Command indexerCommand = m_indexerSubsystem.spinIndexerCommand();
-        Command intakeCommand = m_intakeSubsystem.runIntakeMotor(.5); // temporary (vu postulate)
+        Command intakeCommand = m_intakeSubsystem.runIntakeMotor(1); // temporary (vu postulate)
         Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
         Command unlockServos = m_climberSubsystem.unlockServos();
         Command lockServos = m_climberSubsystem.lockServos();
@@ -157,18 +158,18 @@ public class RobotContainer {
                                 }));
 
                 m_driverController.x().toggleOnTrue(driveRobotOrientedHubLocked);
-                m_driverController.b().toggleOnTrue(driveShooterAlign); // temporary button -
+                m_driverController.b().whileTrue(new PathPlannerAuto("Climber Align")); // temporary button -
                 // great vu postulate
                 m_driverController.y().whileTrue(m_swerveSubsystem.resetGyroCommand());
-                m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
-                m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));
-                m_driverController.povUp().toggleOnTrue(unlockServos.andThen(new WaitCommand(0.3)).andThen(riseCommand));
-                m_driverController.povDown().toggleOnTrue(lockServos.andThen(new WaitCommand(0.3)).andThen(descendCommand));
+                //m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
+                m_driverController.povRight().whileTrue(m_intakeSubsystem.nudgeForward());
+                m_driverController.povUp().whileTrue(unlockServos.andThen(new WaitCommand(0.3)).andThen(riseCommand));
+                m_driverController.povDown().whileTrue(lockServos.andThen(new WaitCommand(0.3)).andThen(descendCommand));
 
                 m_driverController.rightTrigger().whileTrue(shootyBoi);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileTrue(intakeCommand);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileFalse(stopIntakeCommand);
-                m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
+                //m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
 
                 unlockServos.setName("Unlock");
                 lockServos.setName("Lock");

@@ -138,7 +138,7 @@ public class ShooterSubstystem extends SubsystemBase {
     if (Double.isNaN(values[0]))
       return;
 
-    double targetRPM = values[0] * 1.8;// SmartDashboard.getNumber("kMultiplier", 1.5);
+    double targetRPM = values[0] * 1.85;// SmartDashboard.getNumber("kMultiplier", 1.5);
     if (Robot.isSimulation()) {
       targetRPM = values[0];
     }
@@ -147,11 +147,7 @@ public class ShooterSubstystem extends SubsystemBase {
 
     // This method will be called once per scheduler run
 
-    /*
-     * Logger.recordOutput(
-     * "Shooter/SetpointRPM",
-     * m_shootMotor.getClosedLoopController().getSetpoint());
-     */
+    
 
     Logger.recordOutput(
         "Shooter/SimRPM",
@@ -210,8 +206,8 @@ public class ShooterSubstystem extends SubsystemBase {
     Translation2d offsetField = shooterOffset.getTranslation().toTranslation2d().rotateBy(m_swerveSubstystem.getPose2d().getRotation());
     Translation2d velocityDueToRotation = offsetField.rotateBy(Rotation2d.kCCW_90deg).times(w_robot);
 
-    double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond + velocityDueToRotation.getX();
-    double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond + velocityDueToRotation.getY();
+    double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond;// + velocityDueToRotation.getX();
+    double v_robotY = m_swerveSubstystem.getFieldVelocity().vyMetersPerSecond;// + velocityDueToRotation.getY();
 
     // Solves for t = 0 using some special technique called the BrentSolver.
     UnivariateFunction f = t -> {
