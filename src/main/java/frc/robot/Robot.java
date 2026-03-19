@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.utils.Elastic;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 
 public class Robot extends LoggedRobot {
@@ -43,6 +44,11 @@ public class Robot extends LoggedRobot {
     Logger.start();
 
     m_robotContainer = new RobotContainer();
+
+
+    // if(DriverStation.getAlliance().orElseGet(() -> Alliance.Red).equals(Alliance.Red))
+    //   Elastic.selectTab("Red Driver");
+    // else Elastic.selectTab("Blue Driver");
   }
 
   @Override

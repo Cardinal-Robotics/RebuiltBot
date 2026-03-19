@@ -49,7 +49,7 @@ public class SwerveSubsystem extends SubsystemBase {
   public RobotConfig config;
 
   public SwerveSubsystem() {
-    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH; // quoth Lil Vu: "tells YAGSL to print a bunch of stuff"
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.POSE; // quoth Lil Vu: "tells YAGSL to print a bunch of stuff"
 
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve"); // goes to filesystem, finds deploy
                                                                                     // folder, gets swerve folder, gets

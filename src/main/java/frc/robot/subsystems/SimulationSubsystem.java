@@ -43,6 +43,8 @@ public class SimulationSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("x", 0);
     SmartDashboard.putNumber("y", 0);
     SmartDashboard.putNumber("z", 0);
+
+    resetField();
   }
 
   @Override

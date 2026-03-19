@@ -26,6 +26,8 @@ public class ClimberSubsystem extends SubsystemBase {
   public ClimberSubsystem() {
     m_climberMotorLeft.setInverted(false);
     m_climberMotorRight.setInverted(false);
+    SmartDashboard.putBoolean("Invert Left Climber", false);
+    SmartDashboard.putBoolean("Invert Right Climber", false);
   }
 
   public boolean areBottomSwitchesPressed() {
@@ -80,13 +82,15 @@ public class ClimberSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    Logger.recordOutput("Climber/BL", m_bottomLimitSwitchLeft.get());
-    Logger.recordOutput("Climber/BR", !m_bottomLimitSwitchRight.get());
+    stop();
 
-    Logger.recordOutput("Climber/LeftCurrent", m_climberMotorLeft.getStatorCurrent());
-    Logger.recordOutput("Climber/RightCurrent", m_climberMotorRight.getStatorCurrent());
-    Logger.recordOutput("Climber/TopOutL", isLeftClimberToppingOut());
-    Logger.recordOutput("Climber/TopOutR", isRightClimberToppingOut());
+    // Logger.recordOutput("Climber/BL", m_bottomLimitSwitchLeft.get());
+    // Logger.recordOutput("Climber/BR", !m_bottomLimitSwitchRight.get());
+
+    // Logger.recordOutput("Climber/LeftCurrent", m_climberMotorLeft.getStatorCurrent());
+    // Logger.recordOutput("Climber/RightCurrent", m_climberMotorRight.getStatorCurrent());
+    // Logger.recordOutput("Climber/TopOutL", isLeftClimberToppingOut());
+    // Logger.recordOutput("Climber/TopOutR", isRightClimberToppingOut());
   }
 
   public void rise() { // NO RATCHET ON LEFT
@@ -95,14 +99,17 @@ public class ClimberSubsystem extends SubsystemBase {
     // if(!isRightClimberToppingOut()) { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 1); }
     // else { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 0); }
 
-    m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 0.5);
-    m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 0.5);
+
+    // true ? ("Picks this one") : ("Not this")
+    // false ? ("Not this one") : ("This one")
+    m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 0.5 * (SmartDashboard.getBoolean("Invert Left Climber", false) ? -1 : 1));
+    m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 0.5 * (SmartDashboard.getBoolean("Invert Right Climber", false) ? -1 : 1));
   }
 
   public void descend() {
-    if (!m_bottomLimitSwitchLeft.get()) { m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, -0.5); }
+    if (!m_bottomLimitSwitchLeft.get()) { m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, -0.5 * (SmartDashboard.getBoolean("Invert Left Climber", false) ? -1 : 1)); }
     else { m_climberMotorLeft.set(TalonSRXControlMode.PercentOutput, 0); }
-    if (m_bottomLimitSwitchRight.get()) { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, -0.5); }
+    if (m_bottomLimitSwitchRight.get()) { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, -0.5 * (SmartDashboard.getBoolean("Invert Right Climber", false) ? -1 : 1)); }
     else { m_climberMotorRight.set(TalonSRXControlMode.PercentOutput, 0);}
   }
 

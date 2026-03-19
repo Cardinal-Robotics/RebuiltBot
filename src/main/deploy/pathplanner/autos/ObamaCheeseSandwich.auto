@@ -58,18 +58,6 @@
                 }
               },
               {
-                "type": "path",
-                "data": {
-                  "pathName": "LeftToCenter"
-                }
-              },
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "CenterClimb"
-                }
-              },
-              {
                 "type": "named",
                 "data": {
                   "name": "Stop"

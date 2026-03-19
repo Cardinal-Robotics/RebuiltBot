@@ -17,12 +17,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "MidBack"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "Hub Lock"
@@ -75,6 +69,55 @@
           "type": "named",
           "data": {
             "name": "Shoot3s"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stop Hub Lock"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Intake Start"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "DepotShotToMiddle"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Hub Lock"
+          }
+        },
+        {
+          "type": "parallel",
+          "data": {
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "Intake Stop"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Parallel Hub Lock"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot3s"
+                }
+              }
+            ]
           }
         }
       ]

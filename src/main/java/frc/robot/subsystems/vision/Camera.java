@@ -22,6 +22,7 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
@@ -37,7 +38,7 @@ public class Camera {
     private final PhotonPoseEstimator poseEstimator;
     private final Transform3d robotToCameraOffset;
     private final PhotonCamera photonCamera;
-    private final VisionSystemSim visionSim;
+    private static VisionSystemSim visionSim;
 
     private Optional<EstimatedRobotPose> estimatedRobotPose = Optional.empty();
     private List<PhotonPipelineResult> resultsList = new ArrayList<>();
@@ -48,11 +49,10 @@ public class Camera {
     private final Matrix<N3, N1> multiTagStdDevs;
     public Matrix<N3, N1> curStdDevs;
 
-    public Camera(String cameraName, VisionSystemSim visionSim, Transform3d robotToCamera, Matrix<N3, N1> singleTagStdDevs,
+    public Camera(String cameraName, Transform3d robotToCamera, Matrix<N3, N1> singleTagStdDevs,
             Matrix<N3, N1> multiTagStdDevsMatrix) {
         this.photonCamera = new PhotonCamera(cameraName);
         this.robotToCameraOffset = robotToCamera;
-        this.visionSim = visionSim;
 
         this.singleTagStdDevs = singleTagStdDevs;
         this.multiTagStdDevs = multiTagStdDevsMatrix;
@@ -66,6 +66,11 @@ public class Camera {
     }
 
     public void createSimulation() {
+        if(visionSim == null) {
+            visionSim = new VisionSystemSim("main");
+            visionSim.addAprilTags(tagLayout);
+        }
+        
         SimCameraProperties cameraProperties = new SimCameraProperties();
         cameraProperties.setCalibration(960, 720, Rotation2d.fromDegrees(100));
         cameraProperties.setCalibError(0.25, 0.08);
@@ -116,6 +121,10 @@ public class Camera {
         // If we've seen AprilTags recently, run pose estimation.
         if (!resultsList.isEmpty())
             updatePoseEstimation();
+    }
+
+    public static void updateSimulationSwerve(Pose2d pose) {
+        visionSim.update(pose);
     }
 
     private void updateUnreadVisionResults() {

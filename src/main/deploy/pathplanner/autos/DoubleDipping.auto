@@ -29,34 +29,21 @@
           }
         },
         {
-          "type": "parallel",
+          "type": "named",
           "data": {
-            "commands": [
-              {
-                "type": "path",
-                "data": {
-                  "pathName": "MidToDepot"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Parallel Hub Lock"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shoot3s"
-                }
-              }
-            ]
+            "name": "Shoot3s"
           }
         },
         {
           "type": "named",
           "data": {
             "name": "Stop Hub Lock"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "MidToDepot"
           }
         },
         {
@@ -74,19 +61,7 @@
         {
           "type": "named",
           "data": {
-            "name": "Shoot3s"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftToCenter"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "CenterClimb"
+            "name": "Shoot"
           }
         }
       ]

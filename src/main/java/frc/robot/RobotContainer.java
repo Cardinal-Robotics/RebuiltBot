@@ -158,8 +158,8 @@ public class RobotContainer {
         Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
         Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_shooterSubsystem);
         Command shootyBoi = new Shoot(m_shooterSubsystem, m_intakeSubsystem, m_indexerSubsystem);
-        Command riseCommand = new ClimberRise(m_climberSubsystem, 1.5);
-        Command descendCommand = new ClimberDescend(m_climberSubsystem, 1.5);
+        //Command riseCommand = new ClimberRise(m_climberSubsystem, 1.5);
+        //Command descendCommand = new ClimberDescend(m_climberSubsystem, 1.5);
         Command indexerCommand = m_indexerSubsystem.spinIndexerCommand();
         Command intakeCommand = m_intakeSubsystem.runIntakeMotor(1); // temporary (vu postulate)
         Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
@@ -191,15 +191,17 @@ public class RobotContainer {
                 // m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));                
                 m_driverController.povLeft().whileTrue(m_intakeSubsystem.nudgeBack());
                 m_driverController.povRight().whileTrue(m_intakeSubsystem.nudgeForward());
-                m_driverController.povUp().whileTrue(unlockServos.andThen(new WaitCommand(0.3)).andThen(riseCommand));
-                m_driverController.povDown()
-                                .whileTrue(lockServos.andThen(new WaitCommand(0.3)).andThen(descendCommand));
+                //m_driverController.povUp().whileTrue(unlockServos.andThen(new WaitCommand(0.3)).andThen(riseCommand));
+                //m_driverController.povDown().whileTrue(lockServos.andThen(new WaitCommand(0.3)).andThen(descendCommand));
 
                 m_driverController.rightTrigger().whileTrue(shootyBoi);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileTrue(intakeCommand);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileFalse(stopIntakeCommand);
-                // m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
-
+                
+                if(Robot.isSimulation()) {
+                        m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
+                }
+                
                 unlockServos.setName("Unlock");
                 lockServos.setName("Lock");
                 SmartDashboard.putData(unlockServos);
@@ -214,8 +216,8 @@ public class RobotContainer {
                 NamedCommands.registerCommand("Intake Start", intakeCommand);
                 NamedCommands.registerCommand("Run Indexer", indexerCommand);
                 NamedCommands.registerCommand("Intake Stop", stopIntakeCommand);
-                NamedCommands.registerCommand("Climber Rise", riseCommand);
-                NamedCommands.registerCommand("Climber Descend", descendCommand);
+                //NamedCommands.registerCommand("Climber Rise", riseCommand);
+                //NamedCommands.registerCommand("Climber Descend", descendCommand);
                 NamedCommands.registerCommand("Hub Lock", autoHubLock);
                 NamedCommands.registerCommand("Parallel Hub Lock", parallelHubLock);
                 NamedCommands.registerCommand("Stop Hub Lock", parallelHubLock.stop());

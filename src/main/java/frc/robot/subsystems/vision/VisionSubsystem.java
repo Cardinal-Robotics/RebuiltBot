@@ -5,8 +5,11 @@
 package frc.robot.subsystems.vision;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.apriltag.*;
 import frc.robot.Robot;
@@ -26,25 +29,23 @@ public class VisionSubsystem extends SubsystemBase {
 
   private final SwerveSubsystem m_swerveSubsystem;
   private final Camera leftCamera, rightCamera;
-  private final VisionSystemSim visionSim;
 
   public VisionSubsystem(SwerveSubsystem swerveSubsystem) {
     this.m_swerveSubsystem = swerveSubsystem;
 
-    try {
-      File tagLayoutJSON = new File(Filesystem.getDeployDirectory(), "practicefield.json");
-      this.tagLayout = new AprilTagFieldLayout(tagLayoutJSON.toPath());
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+    // try {
+    //   File tagLayoutJSON = new File(Filesystem.getDeployDirectory(), "practicefield.json");
+    //   this.tagLayout = new AprilTagFieldLayout(tagLayoutJSON.toPath());
+    // } catch (Exception e) {
+    //   throw new RuntimeException(e);
+    // }
 
-    //this.tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
+    // CHECK Camera.java
+    this.tagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2026RebuiltWelded);
 
-    this.visionSim = new VisionSystemSim("main");
-    this.visionSim.addAprilTags(tagLayout);
+
 
     leftCamera = new Camera("Left",
-        this.visionSim,
         new Transform3d(
             new Translation3d(
               Meters.fromBaseUnits(0.29613),
@@ -56,7 +57,6 @@ public class VisionSubsystem extends SubsystemBase {
         VecBuilder.fill(0.5, 0.5, 1));
 
     rightCamera = new Camera("Right",
-        this.visionSim,
         new Transform3d(
             new Translation3d(
               Meters.fromBaseUnits(0.29613),
@@ -70,8 +70,7 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if(Robot.isSimulation())
-    visionSim.update(m_swerveSubsystem.getSwerveDrive().getSimulationDriveTrainPose().get());
+    if(Robot.isSimulation()) Camera.updateSimulationSwerve(m_swerveSubsystem.getSwerveDrive().getSimulationDriveTrainPose().get());
 
     // Processes the latest vision data and updates the camera's pose estimation.
     //this.leftCamera.update();
@@ -81,16 +80,16 @@ public class VisionSubsystem extends SubsystemBase {
     // wheel movement odometry.
     Optional<EstimatedRobotPose> rightPoseEstimate = rightCamera.getEstimatedPose();
     //Optional<EstimatedRobotPose> leftPoseEstimate = leftCamera.getEstimatedPose();
-    this.consumePoseEstimate(rightPoseEstimate);
-    //this.consumePoseEstimate(leftPoseEstimate);
+    this.consumePoseEstimate(rightPoseEstimate, rightCamera.curStdDevs);
+    //this.consumePoseEstimate(leftPoseEstimate, leftCamera.curStdDevs);
   }
 
-  public void consumePoseEstimate(Optional<EstimatedRobotPose> poseEstimate) {
+  public void consumePoseEstimate(Optional<EstimatedRobotPose> poseEstimate, Matrix<N3, N1> stdDevs) {
     if (poseEstimate.isEmpty())
       return;
 
     EstimatedRobotPose pose = poseEstimate.get();
-    this.m_swerveSubsystem.addVisionMeasurement(pose, rightCamera.curStdDevs);
+    this.m_swerveSubsystem.addVisionMeasurement(pose, stdDevs);
   }
 
   public Optional<PhotonPipelineResult> getBestResult() {
