@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -53,7 +54,7 @@ public class IntakeSubsystem extends SubsystemBase {
   private SwerveSubsystem m_swerveSubsystem;
 
   private DCMotor m_neoGearbox = DCMotor.getNEO(1);
-  private DutyCycleEncoder absoluteEncoder = new DutyCycleEncoder(0);
+  private DutyCycleEncoder absoluteEncoder = new DutyCycleEncoder(9);
 
   private SparkMax m_pivotMotor = new SparkMax(32, MotorType.kBrushless);
   private SparkMaxSim m_pivotMotorSim = new SparkMaxSim(m_pivotMotor, m_neoGearbox);
@@ -130,6 +131,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public void periodic() {
     armLigament.setAngle(m_pivotMotor.getEncoder().getPosition());
     Logger.recordOutput("Intake/AbsoluteEncoder", absoluteEncoder.get());
+    Logger.recordOutput("Intake/RelativeEncoder", m_pivotMotor.getEncoder().getPosition());
 
     SmartDashboard.putData("Arm Sim", mech);
     Logger.recordOutput("Intake/Pivot", m_pivotMotor.getEncoder().getPosition());
@@ -151,7 +153,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     m_pivotMotorSim.setPosition(Units.radiansToDegrees(m_intakeArmSim.getAngleRads()));
 
-    if(m_pivotMotor.getClosedLoopController().getSetpoint() == 0 && m_intakeMotor.getMotorOutputPercent() > 0) {
+    if(m_pivotMotor.getClosedLoopController().getSetpoint() == 74 && m_intakeMotor.getMotorOutputPercent() > 0) {
       m_intakeSimulation.startIntake();
     } else m_intakeSimulation.stopIntake();
 
@@ -160,12 +162,18 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void setIntakePivot(double angle) {    
-    //m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
+    m_pivotMotor.getClosedLoopController().setSetpoint(angle, ControlType.kPosition);
     Logger.recordOutput("Intake/IdealPivot", angle);
   }
 
   public Command nudgeForward() {
-    return runEnd(() -> m_pivotMotor.set(0.025), () -> m_pivotMotor.set(0.0));
+    Timer timer = new Timer();
+    return runEnd(() -> {
+      m_pivotMotor.set(0.025);
+    } , () -> m_pivotMotor.set(0.0)).beforeStarting(() -> {
+      timer.reset();
+      timer.start();
+    }).repeatedly().until(() -> timer.get() > 2);
   }
 
   public Command nudgeBack() {

@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "Intake Nudge"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [

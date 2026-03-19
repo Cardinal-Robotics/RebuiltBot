@@ -211,11 +211,12 @@ public class RobotContainer {
                                 Commands.print(
                                                 "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"));
                 NamedCommands.registerCommand("Shoot", shootyBoi);
-                NamedCommands.registerCommand("Intake Up", m_intakeSubsystem.setIntakePivotCommand(90));
-                NamedCommands.registerCommand("Intake Down", m_intakeSubsystem.setIntakePivotCommand(0));
+                NamedCommands.registerCommand("Intake Up", m_intakeSubsystem.setIntakePivotCommand(0));
+                NamedCommands.registerCommand("Intake Down", m_intakeSubsystem.setIntakePivotCommand(74));
                 NamedCommands.registerCommand("Intake Start", intakeCommand);
                 NamedCommands.registerCommand("Run Indexer", indexerCommand);
                 NamedCommands.registerCommand("Intake Stop", stopIntakeCommand);
+                NamedCommands.registerCommand("Intake Nudge", m_intakeSubsystem.nudgeForward());
                 //NamedCommands.registerCommand("Climber Rise", riseCommand);
                 //NamedCommands.registerCommand("Climber Descend", descendCommand);
                 NamedCommands.registerCommand("Hub Lock", autoHubLock);

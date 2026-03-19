@@ -4,15 +4,15 @@
     {
       "anchor": {
         "x": 3.625021397994833,
-        "y": 7.379643366619454
+        "y": 7.38
       },
       "prevControl": null,
       "nextControl": {
         "x": 2.994425253033295,
-        "y": 7.379643366619454
+        "y": 7.38
       },
       "isLocked": false,
-      "linkedName": "DepotStart"
+      "linkedName": "MidBackEnd"
     },
     {
       "anchor": {
@@ -110,7 +110,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": false
 }

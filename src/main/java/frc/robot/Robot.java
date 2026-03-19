@@ -35,13 +35,11 @@ public class Robot extends LoggedRobot {
 
     // if (Robot.isSimulation())
     Logger.addDataReceiver(new NT4Publisher());
-
     Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs/"));
+    Logger.registerURCL(URCL.startExternal());
     Logger.start();
 
     // If publishing to NetworkTables and DataLog
-    Logger.registerURCL(URCL.startExternal());
-    Logger.start();
 
     m_robotContainer = new RobotContainer();
 

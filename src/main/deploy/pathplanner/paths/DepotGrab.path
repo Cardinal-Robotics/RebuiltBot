@@ -8,52 +8,36 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.899144578313253,
-        "y": 6.439096385542168
+        "x": 0.44211126961483566,
+        "y": 6.292796005706134
       },
       "isLocked": false,
       "linkedName": "DepotLine"
     },
     {
       "anchor": {
-        "x": 1.942855421686747,
-        "y": 5.991
+        "x": 0.475,
+        "y": 5.426
       },
       "prevControl": {
-        "x": 1.5057469879518075,
-        "y": 7.105626506024098
+        "x": 0.5456205420827388,
+        "y": 6.590479315263908
       },
       "nextControl": {
-        "x": 2.0806545322762924,
-        "y": 5.639612267996658
+        "x": 0.45215182551788147,
+        "y": 5.049250887188094
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.9375060240963853,
-        "y": 5.991
+        "x": 2.4734807417974314,
+        "y": 5.426
       },
       "prevControl": {
-        "x": 0.7265906521633597,
-        "y": 6.125218873048292
-      },
-      "nextControl": {
-        "x": 1.1484213960294107,
-        "y": 5.856781126951708
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 2.7952168674698794,
-        "y": 5.991060240963854
-      },
-      "prevControl": {
-        "x": 2.1176987951807216,
-        "y": 5.98013253012048
+        "x": 1.7959626695082735,
+        "y": 5.415072289156626
       },
       "nextControl": null,
       "isLocked": false,
@@ -63,14 +47,18 @@
   "rotationTargets": [
     {
       "waypointRelativePos": 0.9186721991701003,
-      "rotationDegrees": 0.0
+      "rotationDegrees": 90.0
+    },
+    {
+      "waypointRelativePos": 1.5138592750533013,
+      "rotationDegrees": 90.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 1.7121588089329973,
-      "maxWaypointRelativePos": 2.4625310173697237,
+      "minWaypointRelativePos": 1.35,
+      "maxWaypointRelativePos": 1.75,
       "constraints": {
         "maxVelocity": 1.0,
         "maxAcceleration": 3.0,
