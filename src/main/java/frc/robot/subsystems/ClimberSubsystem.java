@@ -115,14 +115,14 @@ public class ClimberSubsystem extends SubsystemBase {
                                   // climbers can go down, not up
     return runOnce(() -> {
       m_rightClimberServo.set(0);
-      m_leftClimberServo.set(0.4);
+      //m_leftClimberServo.set(0.4);
     });
   }
 
   public Command lockServos() {
     return runOnce(() -> {
       m_rightClimberServo.set(0.4);
-      m_leftClimberServo.set(0);
+      //m_leftClimberServo.set(0);
     });
   }
 
