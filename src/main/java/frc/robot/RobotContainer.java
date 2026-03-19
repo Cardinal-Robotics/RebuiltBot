@@ -1,10 +1,14 @@
 package frc.robot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -61,6 +65,27 @@ public class RobotContainer {
                 // Register Named commands first before building chooser...
                 m_autoChooser = AutoBuilder.buildAutoChooser("Lucas' Auto");
                 SmartDashboard.putData("Auto Chooser", m_autoChooser);
+
+                m_autoChooser.onChange((Command selectedCommand) -> {
+                        String commandName = selectedCommand.getName();
+                        try {
+                                List<PathPlannerPath> trajectory = PathPlannerAuto
+                                                .getPathGroupFromAutoFile(commandName);
+                                List<Pose2d> poses = new ArrayList<>();
+
+                                for (PathPlannerPath path : trajectory) {
+
+                                        if (DriverStation.getAlliance().orElse(Alliance.Red).equals(Alliance.Red))
+                                                path = path.flipPath();
+
+                                        poses.addAll(path.getPathPoses());
+                                }
+
+                                m_swerveSubsystem.getSwerveDrive().field.getObject("trajectory").setPoses(poses);
+                        } catch (Exception exception) {
+
+                        }
+                });
         }
 
         // COMMANDS
@@ -139,7 +164,6 @@ public class RobotContainer {
         Command unlockServos = m_climberSubsystem.unlockServos();
         Command lockServos = m_climberSubsystem.lockServos();
 
-
         // -----------------------------------------------------------------------------------
 
         private void configureBindings() {
@@ -161,15 +185,16 @@ public class RobotContainer {
                 m_driverController.b().whileTrue(new PathPlannerAuto("Climber Align")); // temporary button -
                 // great vu postulate
                 m_driverController.y().whileTrue(m_swerveSubsystem.resetGyroCommand());
-                //m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
+                // m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
                 m_driverController.povRight().whileTrue(m_intakeSubsystem.nudgeForward());
                 m_driverController.povUp().whileTrue(unlockServos.andThen(new WaitCommand(0.3)).andThen(riseCommand));
-                m_driverController.povDown().whileTrue(lockServos.andThen(new WaitCommand(0.3)).andThen(descendCommand));
+                m_driverController.povDown()
+                                .whileTrue(lockServos.andThen(new WaitCommand(0.3)).andThen(descendCommand));
 
                 m_driverController.rightTrigger().whileTrue(shootyBoi);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileTrue(intakeCommand);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileFalse(stopIntakeCommand);
-                //m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
+                // m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
 
                 unlockServos.setName("Unlock");
                 lockServos.setName("Lock");
