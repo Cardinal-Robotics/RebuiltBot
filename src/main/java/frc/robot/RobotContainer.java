@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.Optional;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -139,7 +141,6 @@ public class RobotContainer {
         Command unlockServos = m_climberSubsystem.unlockServos();
         Command lockServos = m_climberSubsystem.lockServos();
 
-
         // -----------------------------------------------------------------------------------
 
         private void configureBindings() {
@@ -161,15 +162,16 @@ public class RobotContainer {
                 m_driverController.b().whileTrue(new PathPlannerAuto("Climber Align")); // temporary button -
                 // great vu postulate
                 m_driverController.y().whileTrue(m_swerveSubsystem.resetGyroCommand());
-                //m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
+                m_driverController.povLeft().whileTrue(m_intakeSubsystem.nudgeBack());
                 m_driverController.povRight().whileTrue(m_intakeSubsystem.nudgeForward());
                 m_driverController.povUp().whileTrue(unlockServos.andThen(new WaitCommand(0.3)).andThen(riseCommand));
-                m_driverController.povDown().whileTrue(lockServos.andThen(new WaitCommand(0.3)).andThen(descendCommand));
+                m_driverController.povDown()
+                                .whileTrue(lockServos.andThen(new WaitCommand(0.3)).andThen(descendCommand));
 
                 m_driverController.rightTrigger().whileTrue(shootyBoi);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileTrue(intakeCommand);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileFalse(stopIntakeCommand);
-                //m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
+                // m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
 
                 unlockServos.setName("Unlock");
                 lockServos.setName("Lock");
@@ -222,4 +224,6 @@ public class RobotContainer {
         public Command getAutonomousCommand() {
                 return m_autoChooser.getSelected();
         }
+
+        
 }

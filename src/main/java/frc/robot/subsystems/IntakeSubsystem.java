@@ -168,6 +168,10 @@ public class IntakeSubsystem extends SubsystemBase {
     return runEnd(() -> m_pivotMotor.set(0.025), () -> m_pivotMotor.set(0.0));
   }
 
+  public Command nudgeBack() {
+    return runEnd(() -> m_pivotMotor.set(-0.25), () -> m_pivotMotor.set(0.0));
+  }
+
   public Command setIntakePivotCommand(double angle) {
     SparkClosedLoopController pidController = m_pivotMotor.getClosedLoopController();
     return runOnce(() -> setIntakePivot(angle)/*  , pidController::isAtSetpoint */);
