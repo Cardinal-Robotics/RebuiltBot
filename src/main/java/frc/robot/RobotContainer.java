@@ -160,7 +160,9 @@ public class RobotContainer {
         Command shootyBoi = new Shoot(m_shooterSubsystem, m_intakeSubsystem, m_indexerSubsystem);
         //Command riseCommand = new ClimberRise(m_climberSubsystem, 1.5);
         //Command descendCommand = new ClimberDescend(m_climberSubsystem, 1.5);
-        Command indexerCommand = m_indexerSubsystem.spinIndexerCommand();
+        Command indexerCommand = m_indexerSubsystem.spinIndexerCommand(1);
+        Command reverseIndexerCommand = m_indexerSubsystem.spinIndexerCommand(-1);
+        Command stopIndexerCommand = m_indexerSubsystem.spinIndexerCommand(0);
         Command intakeCommand = m_intakeSubsystem.runIntakeMotor(1); // temporary (vu postulate)
         Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
         Command unlockServos = m_climberSubsystem.unlockServos();
@@ -197,6 +199,9 @@ public class RobotContainer {
                 m_driverController.rightTrigger().whileTrue(shootyBoi);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileTrue(intakeCommand);// .whileTrue(indexerCommand);
                 m_driverController.leftTrigger().whileFalse(stopIntakeCommand);
+                m_driverController.leftBumper().whileTrue(reverseIndexerCommand).whileFalse(stopIndexerCommand);
+
+
                 
                 if(Robot.isSimulation()) {
                         m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());

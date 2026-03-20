@@ -53,8 +53,7 @@ public class Robot extends LoggedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    double dsTime = DriverStation.getMatchTime();
-    Logger.recordOutput("Match/TimeRemaining", dsTime);
+    Logger.recordOutput("Match/TimeRemaining", getShiftTimer());
     Logger.recordOutput("Match/HubActive", isHubActive());
   }
 
@@ -115,6 +114,29 @@ public class Robot extends LoggedRobot {
     } else {
       // End game, hub always active.
       return true;
+    }
+  }
+
+  public double getShiftTimer() {
+    double matchTime = DriverStation.getMatchTime();
+
+    if (matchTime > 130) {
+      // Transition shift, hub is active.
+      return -1;
+    } else if (matchTime > 105) {
+      // Shift 1
+      return matchTime - 105;
+    } else if (matchTime > 80) {
+      // Shift 2
+      return matchTime - 80;
+    } else if (matchTime > 55) {
+      // Shift 3
+      return matchTime - 55;
+    } else if (matchTime > 30) {
+      // Shift 4
+      return matchTime - 30;
+    } else {
+      return -1;
     }
   }
 

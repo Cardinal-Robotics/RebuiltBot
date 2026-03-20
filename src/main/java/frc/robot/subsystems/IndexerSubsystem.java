@@ -31,11 +31,11 @@ public class IndexerSubsystem extends SubsystemBase {
     m_indexerMotor.set(TalonSRXControlMode.PercentOutput, 0.0);
   }
 
-  public void spinIndexer() {
-    m_indexerMotor.set(TalonSRXControlMode.PercentOutput, 1);
+  public void spinIndexer(double speed) {
+    m_indexerMotor.set(TalonSRXControlMode.PercentOutput, speed);
   }
 
-  public Command spinIndexerCommand() {
-    return run(() -> spinIndexer());
+  public Command spinIndexerCommand(double speed) {
+    return run(() -> spinIndexer(speed));
   }
 }
