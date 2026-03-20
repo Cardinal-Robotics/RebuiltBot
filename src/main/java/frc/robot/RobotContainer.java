@@ -160,8 +160,8 @@ public class RobotContainer {
         Command shootyBoi = new Shoot(m_shooterSubsystem, m_intakeSubsystem, m_indexerSubsystem);
         //Command riseCommand = new ClimberRise(m_climberSubsystem, 1.5);
         //Command descendCommand = new ClimberDescend(m_climberSubsystem, 1.5);
-        Command indexerCommand = m_indexerSubsystem.spinIndexerCommand(1);
-        Command reverseIndexerCommand = m_indexerSubsystem.spinIndexerCommand(-1);
+        Command indexerCommand = m_indexerSubsystem.spinIndexerCommand(0.8);
+        Command reverseIndexerCommand = m_indexerSubsystem.spinIndexerCommand(-0.8);
         Command stopIndexerCommand = m_indexerSubsystem.spinIndexerCommand(0);
         Command intakeCommand = m_intakeSubsystem.runIntakeMotor(1); // temporary (vu postulate)
         Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
@@ -191,8 +191,8 @@ public class RobotContainer {
                 m_driverController.y().whileTrue(m_swerveSubsystem.resetGyroCommand());
 
                 // m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));                
-                m_driverController.povLeft().whileTrue(m_intakeSubsystem.nudgeBack());
-                m_driverController.povRight().whileTrue(m_intakeSubsystem.nudgeForward());
+                m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
+                m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(74));
                 //m_driverController.povUp().whileTrue(unlockServos.andThen(new WaitCommand(0.3)).andThen(riseCommand));
                 //m_driverController.povDown().whileTrue(lockServos.andThen(new WaitCommand(0.3)).andThen(descendCommand));
 

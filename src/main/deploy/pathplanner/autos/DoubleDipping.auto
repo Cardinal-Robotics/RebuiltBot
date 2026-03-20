@@ -43,13 +43,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "MidToDepot"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "DepotGrab"
+            "pathName": "StartToShoot"
           }
         },
         {

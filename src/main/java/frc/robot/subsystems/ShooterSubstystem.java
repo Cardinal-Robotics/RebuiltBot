@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Feet;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -125,6 +126,7 @@ public class ShooterSubstystem extends SubsystemBase {
     SmartDashboard.putNumber("kMultiplier", 1.5);
     SmartDashboard.putNumber("RPM", 0);
     SmartDashboard.putNumber("kF", 0);
+    SmartDashboard.putBoolean("Force Enable Shooter", false);
   }
 
   @Override
@@ -146,8 +148,6 @@ public class ShooterSubstystem extends SubsystemBase {
     setTargetSpeedRPM(targetRPM);
 
     // This method will be called once per scheduler run
-
-    
 
     Logger.recordOutput(
         "Shooter/SimRPM",
@@ -183,6 +183,7 @@ public class ShooterSubstystem extends SubsystemBase {
     double dx = targetPosition.getX() - shooterPosition.getX();
     double dy = targetPosition.getY() - shooterPosition.getY();
     double dz = targetPosition.getZ() - shooterPosition.getZ();
+
     return new double[] { dx, dy, dz };
   }
 
@@ -202,8 +203,8 @@ public class ShooterSubstystem extends SubsystemBase {
     double dx = netTranslation[0], dy = netTranslation[1], dz = netTranslation[2];
     double w_robot = m_swerveSubstystem.getFieldVelocity().omegaRadiansPerSecond;
 
-
-    Translation2d offsetField = shooterOffset.getTranslation().toTranslation2d().rotateBy(m_swerveSubstystem.getPose2d().getRotation());
+    Translation2d offsetField = shooterOffset.getTranslation().toTranslation2d()
+        .rotateBy(m_swerveSubstystem.getPose2d().getRotation());
     Translation2d velocityDueToRotation = offsetField.rotateBy(Rotation2d.kCCW_90deg).times(w_robot);
 
     double v_robotX = m_swerveSubstystem.getFieldVelocity().vxMetersPerSecond;// + velocityDueToRotation.getX();
@@ -323,6 +324,12 @@ public class ShooterSubstystem extends SubsystemBase {
     shootController
         .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage,
             ArbFFUnits.kVoltage);
+
+    if (SmartDashboard.getBoolean("Force Enable Shooter", false)) {
+      shootController
+          .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage,
+              ArbFFUnits.kVoltage);
+    }
   }
 
   public void setUptake(double speed) {

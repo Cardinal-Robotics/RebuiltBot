@@ -120,19 +120,19 @@ public class Robot extends LoggedRobot {
   public double getShiftTimer() {
     double matchTime = DriverStation.getMatchTime();
 
-    if (matchTime > 130) {
+    if (matchTime >= 130) {
       // Transition shift, hub is active.
-      return -1;
-    } else if (matchTime > 105) {
+      return matchTime - 130;
+    } else if (matchTime >= 105) {
       // Shift 1
-      return matchTime - 105;
-    } else if (matchTime > 80) {
+      return matchTime - 105; 
+    } else if (matchTime >= 80) {
       // Shift 2
       return matchTime - 80;
-    } else if (matchTime > 55) {
+    } else if (matchTime >= 55) {
       // Shift 3
       return matchTime - 55;
-    } else if (matchTime > 30) {
+    } else if (matchTime >= 30) {
       // Shift 4
       return matchTime - 30;
     } else {
