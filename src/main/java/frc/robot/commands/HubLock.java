@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import java.util.Optional;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -55,6 +57,8 @@ public class HubLock extends Command {
   public void initialize() {
     PPHolonomicDriveController.setRotationTargetOverride(() -> isEnabled ? Optional.of(new Rotation2d(targetAngle)) : Optional.empty());
     isEnabled = true;
+    Logger.recordOutput("HubLock", true);
+
   }
 
   @Override
@@ -75,6 +79,7 @@ public class HubLock extends Command {
 
   @Override
   public void end(boolean interrupted) {
+    Logger.recordOutput("HubLock", false);
     isEnabled = false;
   }
 
