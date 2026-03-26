@@ -24,8 +24,8 @@ public class AutoShoot extends Command {
   private ShooterSubstystem m_shooterSubstystem;
   private IntakeSubsystem m_intakeSubstystem;
   private IndexerSubsystem m_indexerSubstystem;
-  private double m_fakeStartTime;
-  private double m_trueStartTime;
+  private double m_spacingInterval;
+  private double m_commandStartTime;
   private final double shootTime;
 
   public AutoShoot(ShooterSubstystem shooterSubstystem, IntakeSubsystem intakeSubsystem, IndexerSubsystem indexer,
@@ -41,12 +41,12 @@ public class AutoShoot extends Command {
 
   @Override
   public void initialize() {
-    m_trueStartTime = Timer.getFPGATimestamp();
+    m_commandStartTime = Timer.getFPGATimestamp();
 
 
     if (Robot.isSimulation()) {
-      m_fakeStartTime = Timer.getFPGATimestamp();
-      m_trueStartTime = m_fakeStartTime;
+      m_spacingInterval = Timer.getFPGATimestamp();
+      m_commandStartTime = m_spacingInterval;
     }
   }
 
@@ -60,9 +60,9 @@ public class AutoShoot extends Command {
       m_indexerSubstystem.stopIndexer();
     }
 
-    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_fakeStartTime) > 0.1) { // "units are a man's worst enemy"
+    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_spacingInterval) > 0.1) { // "units are a man's worst enemy"
                                                                                       // - Charlie Malerich 1/26/2026
-      m_fakeStartTime = Timer.getFPGATimestamp();
+      m_spacingInterval = Timer.getFPGATimestamp();
 
       double[] conditions = m_shooterSubstystem.getIdealShooterConditions();
       double RPM = conditions[0];
@@ -90,6 +90,6 @@ public class AutoShoot extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return (Timer.getFPGATimestamp() - m_trueStartTime) > shootTime;
+    return (Timer.getFPGATimestamp() - m_commandStartTime) > shootTime;
   }
 }

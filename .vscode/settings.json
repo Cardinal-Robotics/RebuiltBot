@@ -60,5 +60,7 @@
   "java.dependency.enableDependencyCheckup": false,
   "terminal.integrated.env.windows": {
     "PATH": "${env:PATH}"
-  }
+  },
+  "editor.tabSize": 4,
+  "editor.detectIndentation": false
 }

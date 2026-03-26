@@ -96,7 +96,7 @@ public class ShooterSubstystem extends SubsystemBase {
     SparkMaxConfig shootConfig = new SparkMaxConfig();
 
     shootConfig.idleMode(IdleMode.kCoast);
-    shootConfig.closedLoop.pid(0.00034274, 0, 0);
+    shootConfig.closedLoop.pid(0.0006832, 0, 0);
     // shootConfig.closedLoop.allowedClosedLoopError(100, ClosedLoopSlot.kSlot0);
     shootConfig.inverted(true);
 
@@ -316,7 +316,7 @@ public class ShooterSubstystem extends SubsystemBase {
   }
 
   public void setTargetSpeedRPM(double targetSpeed) {
-    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.13445, 0.0020244, 0.00062254);
+    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.092747, 0.0020776, 0.0006831);
     double feedforwardVoltage = feedforward.calculate(targetSpeed);
     this.setpoint = targetSpeed;
 
