@@ -53,7 +53,7 @@ public class RobotContainer {
 
     public RobotContainer() {
         // Turn on driver camera.
-        CameraServer.startAutomaticCapture();
+        CameraServer.startAutomaticCapture(1);
 
         // Register Named commands first before building chooser...
         configureBindings();

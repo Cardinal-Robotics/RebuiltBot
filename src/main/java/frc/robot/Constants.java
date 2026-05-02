@@ -21,7 +21,7 @@ public final class Constants {
     }
 
     public static final class DriveConstants {
-        public static final double kMaxSpeed = 3.5;
+        public static final double kMaxSpeed = 0;
 
         public static final PPHolonomicDriveController kPathDriveController = new PPHolonomicDriveController(
                 // Translation PID

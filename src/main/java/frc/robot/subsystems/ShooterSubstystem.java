@@ -75,7 +75,7 @@ public class ShooterSubstystem extends SubsystemBase {
 
   private FlywheelSim m_flywheelSim = new FlywheelSim(m_linearSystemProfile, m_neoGearbox);
 
-  private final double theta = Math.toRadians(10);
+  private final double theta = Math.toRadians(37.5718693);
   private final double wheelRadiusMeters = Meters.convertFrom(2, Inches);
   private final double flywheelConversionFactor = (2 * Math.PI * wheelRadiusMeters) / 60.0;
   private final Transform3d shooterOffset = new Transform3d(0.140, 0.145, 0.419, Rotation3d.kZero);
@@ -140,12 +140,13 @@ public class ShooterSubstystem extends SubsystemBase {
     if (Double.isNaN(values[0]))
       return;
 
-    double targetRPM = values[0] * 1.85;// SmartDashboard.getNumber("kMultiplier", 1.5);
+    double targetRPM = values[0] * /* 1.85;//  */SmartDashboard.getNumber("kMultiplier", 1.5) + 143.752528;
     if (Robot.isSimulation()) {
       targetRPM = values[0];
     }
 
-    setTargetSpeedRPM(targetRPM);
+    double rpm = SmartDashboard.getNumber("RPM", 0);
+    setTargetSpeedRPM(rpm);
 
     // This method will be called once per scheduler run
 

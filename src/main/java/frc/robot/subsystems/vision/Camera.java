@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.vision;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,11 +30,12 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.Filesystem;
 import frc.robot.Robot;
 
 // Our own wrapper class that can hold a PhotonCamera and all the other things we need to track with it for convinience.
 public class Camera {
-        private final AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(
+    private AprilTagFieldLayout tagLayout = AprilTagFieldLayout.loadField(
             AprilTagFields.k2026RebuiltWelded);
     private final PhotonPoseEstimator poseEstimator;
     private final Transform3d robotToCameraOffset;
@@ -57,6 +59,13 @@ public class Camera {
         this.singleTagStdDevs = singleTagStdDevs;
         this.multiTagStdDevs = multiTagStdDevsMatrix;
 
+        try {
+            File tagLayoutJSON = new File(Filesystem.getDeployDirectory(), "practicefield.json");
+            this.tagLayout = new AprilTagFieldLayout(tagLayoutJSON.toPath());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         this.poseEstimator = new PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 robotToCameraOffset);
         this.poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
@@ -66,11 +75,11 @@ public class Camera {
     }
 
     public void createSimulation() {
-        if(visionSim == null) {
+        if (visionSim == null) {
             visionSim = new VisionSystemSim("main");
             visionSim.addAprilTags(tagLayout);
         }
-        
+
         SimCameraProperties cameraProperties = new SimCameraProperties();
         cameraProperties.setCalibration(960, 720, Rotation2d.fromDegrees(100));
         cameraProperties.setCalibError(0.25, 0.08);
