@@ -75,7 +75,7 @@ public class ShooterSubstystem extends SubsystemBase {
 
   private FlywheelSim m_flywheelSim = new FlywheelSim(m_linearSystemProfile, m_neoGearbox);
 
-  private final double theta = Math.toRadians(10);
+  private final double theta = Math.toRadians(37.5718693);
   private final double wheelRadiusMeters = Meters.convertFrom(2, Inches);
   private final double flywheelConversionFactor = (2 * Math.PI * wheelRadiusMeters) / 60.0;
   private final Transform3d shooterOffset = new Transform3d(0.140, 0.145, 0.419, Rotation3d.kZero);

@@ -15,6 +15,7 @@ import edu.wpi.first.apriltag.*;
 import frc.robot.Robot;
 import frc.robot.subsystems.SwerveSubsystem;
 
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.simulation.*;
 import org.photonvision.targeting.PhotonPipelineResult;
@@ -79,9 +80,12 @@ public class VisionSubsystem extends SubsystemBase {
     // If we have a pose estimate from a camera, give it to YAGSL to do vision +
     // wheel movement odometry.
     Optional<EstimatedRobotPose> rightPoseEstimate = rightCamera.getEstimatedPose();
-    //Optional<EstimatedRobotPose> leftPoseEstimate = leftCamera.getEstimatedPose();
+    Optional<EstimatedRobotPose> leftPoseEstimate = leftCamera.getEstimatedPose();
+    Logger.recordOutput("vision/rightEstimate", rightPoseEstimate.get().estimatedPose);
+    Logger.recordOutput("vision/leftEstimate", leftPoseEstimate.get().estimatedPose);
+
     this.consumePoseEstimate(rightPoseEstimate, rightCamera.curStdDevs);
-    //this.consumePoseEstimate(leftPoseEstimate, leftCamera.curStdDevs);
+    this.consumePoseEstimate(leftPoseEstimate, leftCamera.curStdDevs);
   }
 
   public void consumePoseEstimate(Optional<EstimatedRobotPose> poseEstimate, Matrix<N3, N1> stdDevs) {

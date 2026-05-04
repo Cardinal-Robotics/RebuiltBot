@@ -88,6 +88,11 @@ public class SwerveSubsystem extends SubsystemBase {
     Logger.recordOutput("YAGSL", m_swerveDrive.getPose());
     m_swerveDrive.updateOdometry();
 
+    // When you enable the robot, it won't violently spin around to 0 degrees but keep its current rotation.
+    if(DriverStation.isDisabled()) {
+        m_swerveDrive.swerveController.thetaController.setSetpoint(this.getPose2d().getRotation().getRadians());
+    }
+
     //Potentially fix issue where robot turns the other way?
 
 /*     Logger.recordOutput("SWERVE_DEBUG/gyro", m_swerveDrive.getYaw());
