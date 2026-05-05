@@ -64,18 +64,10 @@ public class AutoShoot extends Command {
                                                                                       // - Charlie Malerich 1/26/2026
       m_spacingInterval = Timer.getFPGATimestamp();
 
-      double[] conditions = m_shooterSubstystem.getIdealShooterConditions();
-      double RPM = conditions[0];
-      double phi = conditions[1];
-
-      if (Double.isNaN(RPM) || Double.isNaN(phi))
-        return;
-
       // Only shoot if we can actually make it and if we have the ammo for it.
       if (!m_intakeSubstystem.obtainGamePieceFromIntake())
         return;
 
-      m_shooterSubstystem.setTargetSpeedRPM(RPM);
       this.m_shooterSubstystem.createSimulatedFuelProjectile(); // shoot ball
     }
   }

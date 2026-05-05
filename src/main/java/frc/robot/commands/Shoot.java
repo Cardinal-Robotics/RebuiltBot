@@ -26,7 +26,9 @@ public class Shoot extends Command {
   private ShooterSubstystem m_shooterSubstystem;
   private IntakeSubsystem m_intakeSubstystem;
   private IndexerSubsystem m_indexerSubstystem;
+  private Timer simCooldownTimer = new Timer();
   private double m_startTime;
+
 
   public Shoot(ShooterSubstystem shooterSubstystem, IntakeSubsystem intakeSubsystem, IndexerSubsystem indexer) {
     m_shooterSubstystem = shooterSubstystem;
@@ -38,8 +40,10 @@ public class Shoot extends Command {
 
   @Override
   public void initialize() {
-    if (Robot.isSimulation())
-      m_startTime = Timer.getFPGATimestamp();
+    if (Robot.isSimulation()) {
+        m_startTime = Timer.getFPGATimestamp();
+        simCooldownTimer.restart();
+    }
   }
 
   @Override
@@ -52,23 +56,10 @@ public class Shoot extends Command {
       m_indexerSubstystem.stopIndexer();
     }
 
-    if (Robot.isSimulation() && (Timer.getFPGATimestamp() - m_startTime) > 0.1) { // "units are a man's worst enemy" -
+    if (Robot.isSimulation() && simCooldownTimer.hasElapsed(0.1)) { // "units are a man's worst enemy" -
                                                                                   // Charlie Malerich 1/26/2026
-      m_startTime = Timer.getFPGATimestamp();
-
-      double[] conditions = m_shooterSubstystem.getIdealShooterConditions();
-      double RPM = conditions[0];
-      double phi = conditions[1];
-
-      if (Double.isNaN(RPM) || Double.isNaN(phi))
-        return;
-
-      // Only shoot if we can actually make it and if we have the ammo for it.
-      if (!m_intakeSubstystem.obtainGamePieceFromIntake())
-        return;
-
-      m_shooterSubstystem.setTargetSpeedRPM(RPM);
       this.m_shooterSubstystem.createSimulatedFuelProjectile(); // shoot ball
+        simCooldownTimer.restart();
     }
   }
 

@@ -41,19 +41,9 @@ public class ParallelHubLock extends Command {
   @Override
   public void initialize() {
     PPHolonomicDriveController
-        .setRotationTargetOverride(() -> isRotationOverideEnabled ? Optional.of(new Rotation2d(getShooterAngle())) : Optional.empty());
+        .setRotationTargetOverride(() -> isRotationOverideEnabled ? Optional.of(shooter.getIdealDriveAngle()) : Optional.empty());
     isRotationOverideEnabled = true;
     isFinished = false;
-  }
-
-  public double getShooterAngle() {
-    double phi = shooter.getIdealShooterConditions()[1];
-    if (Double.isNaN(phi))
-      targetAngle = swerve.getPose2d().getRotation().getRadians();
-    else
-      targetAngle = phi;
-
-    return targetAngle;
   }
 
   @Override

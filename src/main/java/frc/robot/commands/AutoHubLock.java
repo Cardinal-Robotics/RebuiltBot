@@ -55,7 +55,7 @@ public class AutoHubLock extends Command {
 
   @Override
   public void initialize() {
-    PPHolonomicDriveController.setRotationTargetOverride(() -> isEnabled ? Optional.of(new Rotation2d(targetAngle)) : Optional.empty());
+    PPHolonomicDriveController.setRotationTargetOverride(() -> isEnabled ? Optional.of(shooter.getIdealDriveAngle()) : Optional.empty());
     m_startTime = Timer.getFPGATimestamp();
 
     isEnabled = true;
@@ -63,10 +63,7 @@ public class AutoHubLock extends Command {
 
   @Override
   public void execute() {
-    double phi = shooter.getIdealShooterConditions()[1];
-    if (Double.isNaN(phi))
-      targetAngle = swerve.getPose2d().getRotation().getRadians();
-    else targetAngle = phi;
+    targetAngle = shooter.getIdealDriveAngle().getRadians();
 
     this.swerve.driveFieldOriented(swerveInput.get());
   }

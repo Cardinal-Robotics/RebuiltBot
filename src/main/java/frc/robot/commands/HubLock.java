@@ -46,7 +46,7 @@ public class HubLock extends Command {
       () -> controller.getLeftX() * -1)
       .headingWhile(true)
       .deadband(OperatorConstants.kDEADBAND)
-      .scaleTranslation(0.8)
+      .scaleTranslation(0.5)
       .allianceRelativeControl(true)
       .withControllerHeadingAxis(
           () -> Math.sin(targetAngle),
@@ -63,17 +63,9 @@ public class HubLock extends Command {
 
   @Override
   public void execute() {
-    double phi = shooter.getIdealShooterConditions()[1];
-    if (Double.isNaN(phi))
-      targetAngle = swerve.getPose2d().getRotation().getRadians();
-    else targetAngle = phi;
-    ChassisSpeeds input = swerveInput.get();
-    input.vxMetersPerSecond = Math.min(1.0, input.vxMetersPerSecond);
-    input.vxMetersPerSecond = Math.max(-1.0, input.vxMetersPerSecond);
-    
-    input.vyMetersPerSecond = Math.min(1.0, input.vyMetersPerSecond);
-    input.vyMetersPerSecond = Math.max(-1.0, input.vyMetersPerSecond);
+    targetAngle  = shooter.getIdealDriveAngle().getRadians();
 
+    ChassisSpeeds input = swerveInput.get();
     this.swerve.driveFieldOriented(input);
   }
 

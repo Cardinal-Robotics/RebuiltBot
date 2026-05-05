@@ -74,15 +74,15 @@ public class VisionSubsystem extends SubsystemBase {
     if(Robot.isSimulation()) Camera.updateSimulationSwerve(m_swerveSubsystem.getSwerveDrive().getSimulationDriveTrainPose().get());
 
     // Processes the latest vision data and updates the camera's pose estimation.
-    //this.leftCamera.update();
+    this.leftCamera.update();
     this.rightCamera.update();
 
     // If we have a pose estimate from a camera, give it to YAGSL to do vision +
     // wheel movement odometry.
     Optional<EstimatedRobotPose> rightPoseEstimate = rightCamera.getEstimatedPose();
     Optional<EstimatedRobotPose> leftPoseEstimate = leftCamera.getEstimatedPose();
-    Logger.recordOutput("vision/rightEstimate", rightPoseEstimate.get().estimatedPose);
-    Logger.recordOutput("vision/leftEstimate", leftPoseEstimate.get().estimatedPose);
+    Logger.recordOutput("vision/rightEstimate", rightPoseEstimate.isPresent() ? rightPoseEstimate.get().estimatedPose : Pose3d.kZero);
+    Logger.recordOutput("vision/leftEstimate", leftPoseEstimate.isPresent() ? leftPoseEstimate.get().estimatedPose : Pose3d.kZero);
 
     this.consumePoseEstimate(rightPoseEstimate, rightCamera.curStdDevs);
     this.consumePoseEstimate(leftPoseEstimate, leftCamera.curStdDevs);

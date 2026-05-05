@@ -191,6 +191,9 @@ public class SwerveSubsystem extends SubsystemBase {
     return m_swerveDrive.getFieldVelocity();
   }
 
+  public ChassisSpeeds getRobotVelocity() {
+    return m_swerveDrive.getRobotVelocity();
+  }
 
   public void resetGyro() {
     m_swerveDrive.zeroGyro();

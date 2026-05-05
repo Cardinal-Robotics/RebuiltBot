@@ -44,7 +44,7 @@ public class SimulationSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("y", 0);
     SmartDashboard.putNumber("z", 0);
 
-    resetField();
+    //resetField();
   }
 
   @Override
@@ -65,14 +65,14 @@ public class SimulationSubsystem extends SubsystemBase {
 
     Logger.recordOutput("Tracker", new Pose3d(x, y, z, Rotation3d.kZero)); */
 
-    List<GamePiece> fuelGamePieces = SimulatedArena.getInstance().getGamePiecesByType("");
+/*     List<GamePiece> fuelGamePieces = SimulatedArena.getInstance().getGamePiecesByType("");
     List<Pose3d> poses = new ArrayList<>();
     
     for (int i = 0; i < fuelGamePieces.size(); i++) {
       poses.add(i, fuelGamePieces.get(i).getPose3d());
     }
 
-    Logger.recordOutput("FieldSimulation/Fuel", poses.toArray(Pose3d[]::new));
+    Logger.recordOutput("FieldSimulation/Fuel", poses.toArray(Pose3d[]::new)); */
   }
 
   public static void resetField() {
