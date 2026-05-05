@@ -113,7 +113,7 @@ public class ShooterSubstystem extends SubsystemBase {
         shooterOffset.getZ(), // height offset of where the ball actually zomes out
         2 * wheelRadiusMeters, // diameter; use calipers?
         1.9,
-        0.6, // needs real world tuning
+        0.45, // needs real world tuning
         Math.toDegrees(theta), // output angle
         0.001, 
         1500, 6000, 25, 5.0);
