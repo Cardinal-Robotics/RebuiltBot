@@ -81,7 +81,7 @@ public class ShooterSubstystem extends SubsystemBase {
 
   private FlywheelSim m_flywheelSim = new FlywheelSim(m_linearSystemProfile, m_neoGearbox);
 
-  private final double theta = Math.toRadians(90 - 37.5718693);
+  private final double theta = Math.toRadians(90 - 25);
   private final double wheelRadiusMeters = Meters.convertFrom(2, Inches);
   private final double flywheelConversionFactor = (2 * Math.PI * wheelRadiusMeters) / 60.0;
   private final Transform3d shooterOffset = new Transform3d(0.140, 0.145, 0.419, Rotation3d.kZero);
@@ -113,7 +113,7 @@ public class ShooterSubstystem extends SubsystemBase {
         shooterOffset.getZ(), // height offset of where the ball actually zomes out
         2 * wheelRadiusMeters, // diameter; use calipers?
         1.9,
-        0.45, // needs real world tuning
+        0.425, // needs real world tuning
         Math.toDegrees(theta), // output angle
         0.001, 
         1500, 6000, 25, 5.0);
@@ -288,7 +288,7 @@ public class ShooterSubstystem extends SubsystemBase {
   public boolean atTargetSpeed() {
     double error = Math.abs(this.setpoint - getVelocityRPM());
     Logger.recordOutput("Shooter/RPM Error", error);
-    return error <= 150;
+    return error <= 100;
   }
 
   public void setTargetSpeedRPM(double targetSpeed) {

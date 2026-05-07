@@ -142,7 +142,7 @@ public class RobotContainer {
     Command indexerCommand = m_indexerSubsystem.spinIndexerCommand(0.8);
     Command reverseIndexerCommand = m_indexerSubsystem.spinIndexerCommand(-0.8);
     Command stopIndexerCommand = m_indexerSubsystem.spinIndexerCommand(0);
-    Command intakeCommand = m_intakeSubsystem.runIntakeMotor(1); // temporary (vu postulate)
+    Command intakeCommand = m_intakeSubsystem.runIntakeMotor(0.5); // temporary (vu postulate)
     Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
 
     // -----------------------------------------------------------------------------------
@@ -169,6 +169,12 @@ public class RobotContainer {
 
         m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
         m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(74));
+        m_driverController.povUp().whileTrue(Commands.run(() -> m_shooterSubsystem.adjustShooterOffset(10)));
+        m_driverController.povDown().whileTrue(Commands.run(() -> m_shooterSubsystem.adjustShooterOffset(-10)));
+        m_driverController.povUp().multiPress(2, 0.5)
+            .whileTrue(Commands.run(m_shooterSubsystem::resetShooterOffset));
+        m_driverController.povDown().multiPress(2, 0.5)
+            .whileTrue(Commands.run(m_shooterSubsystem::resetShooterOffset));
 
         m_driverController.rightTrigger().whileTrue(shootyBoi);
         m_driverController.leftTrigger().whileTrue(intakeCommand);
