@@ -25,6 +25,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.commands.ParallelHubLock;
 import frc.robot.commands.AprilTagAlign;
 import frc.robot.commands.ShooterAlign;
+import frc.robot.commands.ThreeSixtyNoScope;
 import frc.robot.commands.AutoHubLock;
 import frc.robot.commands.AutoShoot;
 import frc.robot.commands.HubLock;
@@ -135,6 +136,7 @@ public class RobotContainer {
     Command driveRobotOrientedHubLocked = new HubLock(m_swerveSubsystem, m_shooterSubsystem, m_driverController);
     Command autoHubLock = new AutoHubLock(m_swerveSubsystem, m_shooterSubsystem, m_driverController);
     ParallelHubLock parallelHubLock = new ParallelHubLock(m_shooterSubsystem, m_swerveSubsystem);
+    Command fullTurn = new ThreeSixtyNoScope(m_swerveSubsystem);
 
     Command driveAutoAlign = new AprilTagAlign(m_swerveSubsystem, m_visionSubsystem);
     Command driveShooterAlign = new ShooterAlign(m_swerveSubsystem, m_shooterSubsystem);
@@ -144,7 +146,7 @@ public class RobotContainer {
     Command stopIndexerCommand = m_indexerSubsystem.spinIndexerCommand(0);
     Command intakeCommand = m_intakeSubsystem.runIntakeMotor(0.5); // temporary (vu postulate)
     Command stopIntakeCommand = m_intakeSubsystem.stopIntakeCommand();
-
+    
     // -----------------------------------------------------------------------------------
 
     private void configureBindings() {
@@ -168,7 +170,7 @@ public class RobotContainer {
         m_driverController.y().whileTrue(m_swerveSubsystem.resetGyroCommand());
 
         m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
-        m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(74));
+        m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(80));
         m_driverController.povUp().whileTrue(Commands.run(() -> m_shooterSubsystem.adjustShooterOffset(10)));
         m_driverController.povDown().whileTrue(Commands.run(() -> m_shooterSubsystem.adjustShooterOffset(-10)));
         m_driverController.povUp().multiPress(2, 0.5)
@@ -185,6 +187,7 @@ public class RobotContainer {
             m_driverController.leftStick().whileTrue(SimulationSubsystem.resetFieldCommand());
         }
 
+        NamedCommands.registerCommand("360", fullTurn);
         NamedCommands.registerCommand("Shoot", shootyBoi);
         NamedCommands.registerCommand("Intake Up", m_intakeSubsystem.setIntakePivotCommand(0));
         NamedCommands.registerCommand("Intake Down", m_intakeSubsystem.setIntakePivotCommand(74));

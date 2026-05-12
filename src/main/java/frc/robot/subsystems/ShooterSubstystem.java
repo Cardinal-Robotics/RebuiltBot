@@ -200,7 +200,9 @@ public class ShooterSubstystem extends SubsystemBase {
     Logger.recordOutput("Shooter/TOF", shot.timeOfFlightSec());
 
     this.idealShotAngle = shot.driveAngle();
-    setTargetSpeedRPM(shot.rpm());
+    if(shot.isValid()) {
+        setTargetSpeedRPM(shot.rpm());
+    }
 
     // This method will be called once per scheduler run
     Logger.recordOutput("Shooter/output", shot.rpm());

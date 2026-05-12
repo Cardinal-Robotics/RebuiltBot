@@ -5,6 +5,18 @@
     "data": {
       "commands": [
         {
+          "type": "path",
+          "data": {
+            "pathName": "New New New Path"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "360"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "Intake Down"
@@ -14,6 +26,12 @@
           "type": "named",
           "data": {
             "name": "Intake Start"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "New New New New Path"
           }
         },
         {

@@ -3,29 +3,45 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.625021397994833,
-        "y": 7.38
+        "x": 3.6250213980028523,
+        "y": 7.341
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.4993580599144076,
-        "y": 6.551925820256438
+        "x": 2.8826385542168675,
+        "y": 7.313313253012049
       },
       "isLocked": false,
-      "linkedName": "MidBackEnd"
+      "linkedName": "MidBackPoint"
     },
     {
       "anchor": {
-        "x": 1.9093717948717956,
-        "y": 3.7210384615384617
+        "x": 1.710099857346647,
+        "y": 7.224379457917262
       },
       "prevControl": {
-        "x": 2.564051355206847,
-        "y": 4.960114122681883
+        "x": 1.9545190383779416,
+        "y": 7.27690815430306
+      },
+      "nextControl": {
+        "x": 1.465680676315352,
+        "y": 7.171850761531465
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 1.4772039942938655,
+        "y": 6.253980028530671
+      },
+      "prevControl": {
+        "x": 1.4772039942938655,
+        "y": 6.7974037089871615
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "ClimbCenter"
+      "linkedName": "N^3 Link"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +58,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,
