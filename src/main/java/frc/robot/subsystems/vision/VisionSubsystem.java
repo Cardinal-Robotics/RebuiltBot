@@ -50,10 +50,10 @@ public class VisionSubsystem extends SubsystemBase {
         new Transform3d(
             new Translation3d(
               Meters.fromBaseUnits(0.29613),
-              Meters.fromBaseUnits(-0.22033),
+              Meters.fromBaseUnits(0.22033),
               Meters.fromBaseUnits(0.15914)
             ),
-            new Rotation3d(Math.toRadians(180), Math.toRadians(66.602095), 0)),
+            new Rotation3d(Math.toRadians(0), Math.toRadians(-66.602095 + 20.65), 0)),
         VecBuilder.fill(4, 4, 8),
         VecBuilder.fill(0.5, 0.5, 1));
 
@@ -64,7 +64,7 @@ public class VisionSubsystem extends SubsystemBase {
               Meters.fromBaseUnits(-0.22033),
               Meters.fromBaseUnits(0.15914)
             ),
-            new Rotation3d(0, Math.toRadians(45.0), 0)),
+            new Rotation3d(0, Math.toRadians(-24), 0)),
         VecBuilder.fill(4, 4, 8),
         VecBuilder.fill(0.5, 0.5, 1));
   }
