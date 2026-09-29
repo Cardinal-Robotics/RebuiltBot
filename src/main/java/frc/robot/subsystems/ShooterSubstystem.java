@@ -15,6 +15,13 @@ import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.solvers.BrentSolver;
 import org.littletonrobotics.junction.Logger;
 
+import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.PersistMode;
 import com.revrobotics.ResetMode;
 import com.revrobotics.sim.SparkMaxSim;
@@ -42,6 +49,7 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -61,14 +69,13 @@ import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.Rebu
 import swervelib.simulation.ironmaple.utils.FieldMirroringUtils;
 
 public class ShooterSubstystem extends SubsystemBase {
-  private SparkMax m_shootMotor = new SparkMax(35, MotorType.kBrushless);
-  private SparkClosedLoopController shootController = m_shootMotor.getClosedLoopController();
+  private TalonFX m_shootMotor = new TalonFX(35);
 
   private SparkMax m_uptakeMotor = new SparkMax(31, MotorType.kBrushless);
 
   private DCMotor m_neoGearbox = DCMotor.getNEO(1);
 
-  private SparkMaxSim m_shootMotorSim = new SparkMaxSim(m_shootMotor, m_neoGearbox);
+  //private SparkMaxSim m_shootMotorSim = new TalonFXSim(m_shootMotor, m_neoGearbox);
 
   private SwerveSubsystem m_swerveSubstystem;
   private Rotation2d idealShotAngle = Rotation2d.kZero;
@@ -92,13 +99,16 @@ public class ShooterSubstystem extends SubsystemBase {
   private FuelPhysicsSim ballSim;
 
   private SysIdRoutine routine = new SysIdRoutine(
-      new SysIdRoutine.Config(null, null, null, (state) -> Logger.recordOutput("SysIdTestState", state.toString())),
-      new SysIdRoutine.Mechanism(
-          (voltage) -> m_shootMotor.setVoltage(voltage.in(Volts)),
+      new SysIdRoutine.Config(null, Volts.of(4), null, (state) -> {
+        SignalLogger.writeString("SysIdShooter_State", state.toString(), 0.0);
+        SmartDashboard.putString("ALDILSDAI", state.toString());
+    }),
+      new SysIdRoutine.Mechanism((voltage) -> m_shootMotor.setVoltage(voltage.in(Volts)),
           null,
           this));
 
   public ShooterSubstystem(SwerveSubsystem swerveSubsystem) {
+    SignalLogger.writeString("SysIdShooter_State", "none");
     SmartDashboard.putData(routine.dynamic(Direction.kForward).withName("Forward Dynamic"));
     SmartDashboard.putData(routine.dynamic(Direction.kReverse).withName("Reverse Dynamic"));
     SmartDashboard.putData(routine.quasistatic(Direction.kForward).withName("Forward Quasistatic"));
@@ -135,28 +145,30 @@ public class ShooterSubstystem extends SubsystemBase {
     }
 
 
-    SparkMaxConfig shooterMotorConfig = new SparkMaxConfig();
-    shooterMotorConfig.idleMode(IdleMode.kCoast);
-    shooterMotorConfig.closedLoop.pid(0.0006832, 0, 0);
-    // shootConfig.closedLoop.allowedClosedLoopError(100, ClosedLoopSlot.kSlot0);
-    shooterMotorConfig.inverted(true);
-    shooterMotorConfig.encoder.quadratureMeasurementPeriod(10);
-    shooterMotorConfig.encoder.quadratureAverageDepth(1);
+    TalonFXConfiguration shooterMotorConfig = new TalonFXConfiguration();
+    shooterMotorConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    shooterMotorConfig.Slot0.kP = 0.11525;
+    shooterMotorConfig.Slot0.kI = 0;
+    shooterMotorConfig.Slot0.kD = 0;
+    shooterMotorConfig.Slot0.kS = 0.089039;
+    shooterMotorConfig.Slot0.kV = 0.11535;
+    shooterMotorConfig.Slot0.kA = 0.016818;
+
+    m_shootMotor.getConfigurator().apply(shooterMotorConfig);
+    m_shootMotor.setNeutralMode(NeutralModeValue.Coast);
+    
+    
 
     SparkMaxConfig uptakeConfig = new SparkMaxConfig();
     uptakeConfig.idleMode(IdleMode.kBrake);
     uptakeConfig.inverted(true);
-    m_shootMotor.configure(
-        shooterMotorConfig,
-        ResetMode.kResetSafeParameters,
-        PersistMode.kPersistParameters);
+
 
     m_uptakeMotor.configure(
         uptakeConfig,
         ResetMode.kResetSafeParameters,
         PersistMode.kPersistParameters);
 
-    m_shootMotor.getEncoder();
     m_uptakeMotor.getEncoder();
 
     m_swerveSubstystem = swerveSubsystem;
@@ -182,8 +194,10 @@ public class ShooterSubstystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Logger", SignalLogger.start().value);
+
     if (!DriverStation.isEnabled()) {
-      m_shootMotor.getClosedLoopController().setIAccum(0);
+      //m_shootMotor.setIAccum(0);
     }
 
     ShotCalculator.ShotInputs inputs = new ShotCalculator.ShotInputs(
@@ -211,7 +225,10 @@ public class ShooterSubstystem extends SubsystemBase {
         m_flywheelSim.getAngularVelocityRPM());
     Logger.recordOutput(
         "Shooter/RPM",
-        m_shootMotor.getEncoder().getVelocity());
+        getVelocityRPM());
+    Logger.recordOutput("Shooter/Position",
+        m_shootMotor.getPosition().getValue());
+    //Logger.recordOutput("Shooter/Voltage", m_shootMotor.().getValue());
   }
 
   public void adjustShooterOffset(double rpmOffset) { shotCalculator.adjustOffset(rpmOffset); }
@@ -266,47 +283,46 @@ public class ShooterSubstystem extends SubsystemBase {
     ballSim.tick();
 
     m_flywheelSim.setInputVoltage(
-        m_shootMotor.getAppliedOutput()
+        m_shootMotor.get()
             * RobotController.getInputVoltage());
 
     m_flywheelSim.update(timestep);
 
-    m_shootMotorSim.iterate(
+/*     m_shootMotorSim.iterate(
         m_flywheelSim.getAngularVelocityRPM(),
         RobotController.getInputVoltage(),
-        timestep);
+        timestep); */
 
-    RoboRioSim.setVInVoltage(
+ /*    RoboRioSim.setVInVoltage(
         BatterySim.calculateDefaultBatteryLoadedVoltage(
-            m_shootMotor.getOutputCurrent()));
+            m_shootMotor.getOut())); */
   }
 
   public double getVelocityRPM() {
     if (Robot.isSimulation())
       return m_flywheelSim.getAngularVelocityRPM();
-    return m_shootMotor.getEncoder().getVelocity();
+    return m_shootMotor.getVelocity().getValueAsDouble() * 60.0;
   }
 
   public boolean atTargetSpeed() {
-    double error = Math.abs(this.setpoint - getVelocityRPM());
+    double error = Math.abs(this.setpoint * 60 - getVelocityRPM());
     Logger.recordOutput("Shooter/RPM Error", error);
     return error <= 100;
   }
 
   public void setTargetSpeedRPM(double targetSpeed) {
-    SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.092747, 0.0020776, 0.0006831);
-    double feedforwardVoltage = feedforward.calculate(targetSpeed);
+    targetSpeed /= 60.0;
+    //SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0.092747, 0.0020776, 0.0006831);
+    //double feedforwardVoltage = feedforward.calculate(targetSpeed);
     this.setpoint = targetSpeed;
 
     Logger.recordOutput("Shooter/SetpointRPM", targetSpeed);
-    shootController
-        .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage,
-            ArbFFUnits.kVoltage);
+    VelocityVoltage targetVelocity = new VelocityVoltage(targetSpeed);
+
+    m_shootMotor.setControl(targetVelocity);
 
     if (SmartDashboard.getBoolean("Force Enable Shooter", false)) {
-      shootController
-          .setSetpoint(targetSpeed, ControlType.kVelocity, ClosedLoopSlot.kSlot0, feedforwardVoltage,
-              ArbFFUnits.kVoltage);
+      m_shootMotor.setControl(targetVelocity);
     }
   }
 

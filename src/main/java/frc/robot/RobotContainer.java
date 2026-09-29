@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.ctre.phoenix6.SignalLogger;
 import com.pathplanner.lib.auto.AutoBuilder;
 
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -168,6 +169,7 @@ public class RobotContainer {
         m_driverController.b().whileTrue(new PathPlannerAuto("Climber Align")); // temporary button -
         // great vu postulate
         m_driverController.y().whileTrue(m_swerveSubsystem.resetGyroCommand());
+        m_driverController.a().whileTrue(Commands.runOnce(SignalLogger::stop));
 
         m_driverController.povLeft().whileTrue(m_intakeSubsystem.setIntakePivotCommand(0));
         m_driverController.povRight().whileTrue(m_intakeSubsystem.setIntakePivotCommand(90));

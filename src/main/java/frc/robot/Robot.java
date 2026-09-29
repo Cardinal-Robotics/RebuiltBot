@@ -8,6 +8,8 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 import org.littletonrobotics.urcl.URCL;
 
+import com.ctre.phoenix6.SignalLogger;
+
 import java.util.Optional;
 
 import org.littletonrobotics.junction.LoggedRobot;
@@ -36,8 +38,14 @@ public class Robot extends LoggedRobot {
     // if (Robot.isSimulation())
     Logger.addDataReceiver(new NT4Publisher());
     Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs/"));
-    Logger.registerURCL(URCL.startExternal());
+    //Logger.registerURCL(URCL.startExternal());
     Logger.start();
+
+    // Set the logger to log to the first flashdrive plugged in (default on roboRIO)
+    //SignalLogger.setPath("/home/lvuser/logs/");
+
+    // Explicitly start the logger
+    //SignalLogger.start();
 
     // If publishing to NetworkTables and DataLog
 

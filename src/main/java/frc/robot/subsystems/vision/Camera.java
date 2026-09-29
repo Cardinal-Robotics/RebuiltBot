@@ -59,12 +59,12 @@ public class Camera {
         this.singleTagStdDevs = singleTagStdDevs;
         this.multiTagStdDevs = multiTagStdDevsMatrix;
 
-        try {
+/*         try {
             File tagLayoutJSON = new File(Filesystem.getDeployDirectory(), "practicefield.json");
             this.tagLayout = new AprilTagFieldLayout(tagLayoutJSON.toPath());
         } catch (Exception e) {
             throw new RuntimeException(e);
-        }
+        } */
 
         this.poseEstimator = new PhotonPoseEstimator(tagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
                 robotToCameraOffset);
